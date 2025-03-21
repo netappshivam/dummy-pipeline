@@ -1,0 +1,47 @@
+name: Go CI
+
+on:
+  push:
+    branches:
+        - main
+        - Tag_branch
+
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.24.1'
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Run tests
+        run: go test ./...
+
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "Shivam.Bisht@netapp.com"
+          git config --local user.name "netapppshivam"
+
+      - name: Create and push a tag
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          TAG_NAME="v1.0-${COMMIT_SHA:0:7}"
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
