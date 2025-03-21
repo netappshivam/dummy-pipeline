@@ -35,10 +35,12 @@ jobs:
 
       - name: Configure Git
         run: |
-          git config --local user.email "Shivam.Bisht@netapp.com"
-          git config --local user.name "netapppshivam"
+          git config --global user.email "Shivam.Bisht@netapp.com"
+          git config --global user.name "netapppshivam"
 
       - name: Create and push a tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           TAG_NAME="v1.0.0"
           git tag $TAG_NAME
