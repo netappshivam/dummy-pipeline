@@ -1,27 +1,29 @@
-# Start from a Debian-based image with Go installed
-FROM golang:1.18-buster as builder
+# Use the official Golang image as the builder
+FROM golang:1.18-buster AS builder
 
-# Set the working directory outside $GOPATH to enable the support for modules.
+# Set the working directory
 WORKDIR /app
 
-# Copy the go.mod and go.sum to download all dependencies
+# Copy the go.mod and go.sum files
 COPY go.mod go.sum ./
+
+# Download dependencies
 RUN go mod download
 
-# Copy the rest of the source code
+# Copy the rest of the application code
 COPY . .
 
-# Build the binary with full optimizations and without debug information
+# Build the application
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 
-# Use a Docker multi-stage build to create a lean production image.
+# Use a minimal image for the final stage
 FROM alpine:latest
 
-# Install ca-certificates in case you need them
-RUN apk --no-cache add ca-certificates
+# Set the working directory
+WORKDIR /root/
 
-# Copy the pre-built binary file from the previous stage
+# Copy the built application from the builder stage
 COPY --from=builder /app/main .
 
-# Run the binary.
+# Command to run the application
 CMD ["./main"]
