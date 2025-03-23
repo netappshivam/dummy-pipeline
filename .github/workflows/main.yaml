@@ -63,7 +63,7 @@ jobs:
           LATEST_TAG=${{ steps.get_latest_tag.outputs.LATEST_TAG }}
           echo "Latest tag: $LATEST_TAG"
           TAG_PREFIX="v"
-          if [[ "$LATEST_TAG" =~ ^$TAG_PREFIX([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+          if [[ "$LATEST_TAG" =~ ^$TAG_PREFIX([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then 
             MAJOR=${BASH_REMATCH[1]}
             MINOR=${BASH_REMATCH[2]}
             PATCH=${BASH_REMATCH[3]}
@@ -82,3 +82,43 @@ jobs:
           NEW_TAG=${{ steps.increment_tag.outputs.NEW_TAG }}
           git tag $NEW_TAG
           git push origin $NEW_TAG
+
+  release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.18'
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v3
+
+      - name: Get dependencies
+        run: go mod download
+
+      - name: Build
+        run: CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+
+      - name: Build Docker image
+        run: docker build . --file Dockerfile --tag username/repository:$(echo $GITHUB_REF | sed 's/refs\/tags\///')
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Docker image
+        run: docker push username/repository:$(echo $GITHUB_REF | sed 's/refs\/tags\///')
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
