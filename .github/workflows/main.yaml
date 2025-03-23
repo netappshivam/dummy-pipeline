@@ -101,6 +101,10 @@ jobs:
       - name: Build
         run: CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 
+      - name: Extract branch or tag name
+        id: extract_ref
+        run: echo ::set-output name=REF_NAME::${GITHUB_REF#refs/*/}
+
       - name: Build Docker image
         run: docker build . --file Dockerfile --tag username/repository:$(echo $GITHUB_REF | sed 's/refs\/tags\///')
 
