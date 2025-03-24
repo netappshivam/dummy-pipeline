@@ -112,7 +112,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build . --file Dockerfile --tag username/repository:$(echo $GITHUB_REF | sed 's/refs\/heads\///' | sed 's/refs\/tags\///')
+        run: docker buildx build . --file Dockerfile --tag username/repository:$(echo $GITHUB_REF | sed 's/refs\/heads\///' | sed 's/refs\/tags\///')
 
       - name: Push Docker image
         run: docker push username/repository:$(echo $GITHUB_REF | sed 's/refs\/heads\///' | sed 's/refs\/tags\///')
