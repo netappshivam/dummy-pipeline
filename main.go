@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -16,4 +17,8 @@ func main() {
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Fatal(err)
 	}
+
+	myEnvVar := os.Getenv("MY_ENV_VAR")
+	fmt.Println(myEnvVar) // Prints: Hello, World!
+
 }
