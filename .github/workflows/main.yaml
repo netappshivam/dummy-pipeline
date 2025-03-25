@@ -112,11 +112,11 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker buildx build . --file Dockerfile --tag username/repository:$(echo $GITHUB_REF | sed 's/refs\/heads\///' | sed 's/refs\/tags\///')
+        run: docker buildx build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/repository:$(echo $GITHUB_REF | sed 's/refs\/heads\///' | sed 's/refs\/tags\///')
 
       - name: Push Docker image
         run: |
-          docker push sbisht286/dummy-pipeline:$(echo $GITHUB_REF | sed 's/refs\/heads\///' | sed 's/refs\/tags\///')
+          docker push ${{ secrets.DOCKER_USERNAME }}/repository:$(echo $GITHUB_REF | sed 's/refs\/heads\///' | sed 's/refs\/tags\///')
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
