@@ -30,7 +30,7 @@ jobs:
       - name: Configure Git
         run: |
           git config --global user.email "Shivam.Bisht@netapp.com"
-          git config --global user.name "netapppshivam"
+          git config --global user.name "netappshivam"
 
       - name: Create and push new tag
         env:
