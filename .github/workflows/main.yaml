@@ -115,7 +115,9 @@ jobs:
         run: docker buildx build . --file Dockerfile --tag username/repository:$(echo $GITHUB_REF | sed 's/refs\/heads\///' | sed 's/refs\/tags\///')
 
       - name: Push Docker image
-        run: docker push username/repository:$(echo $GITHUB_REF | sed 's/refs\/heads\///' | sed 's/refs\/tags\///')
+        run: |
+          echo username/repository:$(echo $GITHUB_REF | sed 's/refs\/heads\///' | sed 's/refs\/tags\///')
+          docker push username/repository:$(echo $GITHUB_REF | sed 's/refs\/heads\///' | sed 's/refs\/tags\///')
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
