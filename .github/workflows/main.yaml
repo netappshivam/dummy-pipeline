@@ -1,129 +1,41 @@
-name: Go CI
+name: Go Tag Increment
 
 on:
   push:
     branches:
-        - main
-        - Tag_branch
+      - main
+      - Go-git
 
-  pull_request:
 jobs:
-  build:
+  tag-increment:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write  # Allow read and write access to the repository contents
-      actions: read
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
-          token: '${{ secrets.GH_PAT }}'
+          fetch-depth: 0  # Fetch all history for all tags and branches
 
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: '1.24.1'
+          go-version: '1.18' # Specify the Go version
 
-      - name: Install dependencies
-        run: go mod tidy
+      - name: Build increment_tag script
+        run: go build -v ./increment_tag.go
 
-#      - name: Run tests
-#        run: go test ./...
-
-  tag:
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: write  # Allow read and write access to the repository contents
-      actions: read
-      packages: write  # Add this line to allow pushing tags
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - name: Run increment_tag script
+        id: increment_tag
+        run: ./increment_tag
 
       - name: Configure Git
         run: |
           git config --global user.email "Shivam.Bisht@netapp.com"
           git config --global user.name "netapppshivam"
 
-      - name: Fetch all tags
-        run: git fetch --tags
-
-      - name: Get the latest tag
-        id: get_latest_tag
-        run: echo ::set-output name=LATEST_TAG::$(git describe --tags `git rev-list --tags --max-count=1`)
-
-      - name: Increment tag version
-        id: increment_tag
-        run: |
-          LATEST_TAG=${{ steps.get_latest_tag.outputs.LATEST_TAG }}
-          echo "Latest tag: $LATEST_TAG"
-          TAG_PREFIX="v"
-          if [[ "$LATEST_TAG" =~ ^$TAG_PREFIX([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then 
-            MAJOR=${BASH_REMATCH[1]}
-            MINOR=${BASH_REMATCH[2]}
-            PATCH=${BASH_REMATCH[3]}
-            NEW_TAG="$TAG_PREFIX$MAJOR.$MINOR.$((PATCH+1))"
-            echo "New tag: $NEW_TAG"
-            echo ::set-output name=NEW_TAG::$NEW_TAG
-          else
-            echo "No valid tag found, setting initial tag."
-            echo ::set-output name=NEW_TAG::"${TAG_PREFIX}1.0.0"
-          fi
-
-      - name: Create and push a new tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-        run: |
-          NEW_TAG=${{ steps.increment_tag.outputs.NEW_TAG }}
-          git tag $NEW_TAG
-          git push origin $NEW_TAG
-
-  release:
-    name: Build and Release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: '1.18'
-
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v3
-
-      - name: Get dependencies
-        run: go mod download
-
-      - name: Build
-        run: CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
-
-      - name: Extract branch or tag name
-        id: extract_ref
-        run: echo ::set-output name=REF_NAME::${GITHUB_REF#refs/*/}
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build Docker image
-        run: docker buildx build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/repository:$(echo $GITHUB_REF | sed 's/refs\/heads\///' | sed 's/refs\/tags\///')
-
-      - name: Push Docker image
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/repository:$(echo $GITHUB_REF | sed 's/refs\/heads\///' | sed 's/refs\/tags\///')
-
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
+      - name: Create and push new tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
+        run: |
+          NEW_TAG=${{ steps.increment_tag.outputs.new_tag }}
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
