@@ -7,8 +7,15 @@ on:
       - Go-git
 
 jobs:
+
   tag-increment:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Allow read and write access to the repository contents
+      actions: read
+      packages: write  # Add this line to allow pushing tags
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
