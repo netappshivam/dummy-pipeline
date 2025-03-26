@@ -19,7 +19,7 @@ func main() {
 	}
 
 	// Get all tag names
-	cmd = exec.Command("git", "tag", "--list", "v*-DEV.*")
+	cmd = exec.Command("git", "tag", "--list", "v*-RC.*")
 	output, err := cmd.Output()
 	if err != nil {
 		fmt.Println("Error listing tags:", err)
@@ -40,13 +40,13 @@ func main() {
 
 	// Sort tags using semantic versioning rules
 	sort.Slice(semverTags, func(i, j int) bool {
-		return versionCompare(semverTags[i], semverTags[j])
+		return versionCompare_RC(semverTags[i], semverTags[j])
 	})
 
 	// No tags found, start with initial version
 	if len(semverTags) == 0 {
-		fmt.Println("No tags found, creating the first tag v0.0.0-DEV.1")
-		fmt.Println("::set-output name=new_tag::v0.0.0-DEV.1")
+		fmt.Println("No tags found, creating the first tag v0.0.0-RC.1")
+		fmt.Println("::set-output name=new_tag::v0.0.0-RC.1")
 		os.Exit(0)
 	}
 
@@ -59,21 +59,21 @@ func main() {
 		fmt.Println("Latest tag does not follow semantic versioning:", latestTag)
 		os.Exit(1)
 	}
-	devParts := strings.Split(parts[1], ".")
-	if len(devParts) != 2 || devParts[0] != "DEV" {
+	rcParts := strings.Split(parts[1], ".")
+	if len(rcParts) != 2 || rcParts[0] != "RC" {
 		fmt.Println("Latest tag does not follow semantic versioning:", latestTag)
 		os.Exit(1)
 	}
-	devNumber, _ := strconv.Atoi(devParts[1])
-	devNumber++
-	newTag := fmt.Sprintf("v%s-DEV.%d", parts[0], devNumber)
+	rcNumber, _ := strconv.Atoi(rcParts[1])
+	rcNumber++
+	newTag := fmt.Sprintf("v%s-RC.%d", parts[0], rcNumber)
 
 	// Output the new tag to be used by other steps
 	fmt.Printf("::set-output name=new_tag::%s\n", newTag)
 }
 
 // versionCompare_RC compares two semantic versioning tags.
-func versionCompare(tag1, tag2 string) bool {
+func versionCompare_RC(tag1, tag2 string) bool {
 	version1 := strings.TrimPrefix(tag1, "v")
 	version2 := strings.TrimPrefix(tag2, "v")
 
@@ -84,7 +84,7 @@ func versionCompare(tag1, tag2 string) bool {
 		return v1Parts[0] < v2Parts[0]
 	}
 
-	dev1, _ := strconv.Atoi(strings.TrimPrefix(v1Parts[1], "DEV."))
-	dev2, _ := strconv.Atoi(strings.TrimPrefix(v2Parts[1], "DEV."))
-	return dev1 < dev2
+	rc1, _ := strconv.Atoi(strings.TrimPrefix(v1Parts[1], "RC."))
+	rc2, _ := strconv.Atoi(strings.TrimPrefix(v2Parts[1], "RC."))
+	return rc1 < rc2
 }

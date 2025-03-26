@@ -15,6 +15,7 @@ COPY . .
 
 # Build the application
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o rc .
 
 # Use a minimal image for the final stage
 FROM alpine:latest
@@ -24,6 +25,8 @@ WORKDIR /root/
 
 # Copy the built application from the builder stage
 COPY --from=builder /app/main .
+COPY --from=builder /app/rc .
 
 # Command to run the application
 CMD ["./main"]
+CMD ["./rc"]
