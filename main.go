@@ -26,13 +26,19 @@ func main() {
 		os.Exit(1)
 	}
 	rawTags := strings.Split(strings.TrimSpace(string(output)), "\n")
+	//
+	//fmt.Printf("Found %d tags\n", len(rawTags))
+	//
+	//for x := range rawTags {
+	//	fmt.Println(rawTags[x])
+	//}
 
 	// Filter tags that follow semantic versioning
 	semverTags := make([]string, 0)
 	for _, tag := range rawTags {
 		if strings.HasPrefix(tag, "v") {
-			parts := strings.Split(strings.TrimPrefix(tag, "v"), ".")
-			if len(parts) == 3 {
+			parts := strings.Split(strings.TrimPrefix(tag, "v"), "-")
+			if len(parts) == 2 {
 				semverTags = append(semverTags, tag)
 			}
 		}
@@ -45,8 +51,8 @@ func main() {
 
 	// No tags found, start with initial version
 	if len(semverTags) == 0 {
-		fmt.Println("No tags found, creating the first tag v1.0.0")
-		fmt.Println("::set-output name=new_tag::v1.0.0")
+		fmt.Println("No tags found, creating the first tag v1.0.0-DEV.1")
+		fmt.Println("::set-output name=new_tag::v1.0.0-DEV.1")
 		os.Exit(0)
 	}
 
