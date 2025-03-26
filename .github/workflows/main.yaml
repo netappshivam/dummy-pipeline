@@ -7,7 +7,6 @@ on:
       - Go-git
 
 jobs:
-
   tag-increment:
     runs-on: ubuntu-latest
 
@@ -27,7 +26,12 @@ jobs:
         with:
           go-version: '1.18' # Specify the Go version
 
-      - name: Build increment_tag script
+      - name: Build increment_tag script for release
+        if: contains(github.ref, 'release')
+        run: go build -o increment_tag ./rc.go
+
+      - name: Build increment_tag script for main
+        if: contains(github.ref, 'main')
         run: go build -o increment_tag ./main.go
 
       - name: Run increment_tag script
