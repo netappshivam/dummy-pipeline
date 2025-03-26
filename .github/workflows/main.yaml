@@ -3,6 +3,7 @@ name: Go Tag Increment
 on:
   push:
     branches:
+      - master
       - main
       - Go-git
 
