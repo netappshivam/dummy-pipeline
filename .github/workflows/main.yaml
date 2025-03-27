@@ -39,7 +39,9 @@ jobs:
 
       - name: Run increment_tag script
         id: increment_tag
-        run: ./increment_tag
+        run: |
+          ls 
+          ./increment_tag
 
       - name: Configure Git
         run: |
