@@ -10,6 +10,9 @@ import (
 )
 
 func main() {
+
+	currentTagDateName := Xyz()
+
 	// Fetch all tags from the remote
 	cmd := exec.Command("git", "fetch", "--tags")
 	err := cmd.Run()
@@ -31,7 +34,7 @@ func main() {
 	semverTags := make([]string, 0)
 	for _, tag := range rawTags {
 		if strings.HasPrefix(tag, "v") {
-			parts := strings.Split(strings.TrimPrefix(tag, "v"), "-")
+			parts := strings.Split(strings.TrimPrefix(tag, currentTagDateName), "-")
 			if len(parts) == 2 {
 				semverTags = append(semverTags, tag)
 			}
@@ -46,8 +49,13 @@ func main() {
 	// No tags found, start with initial version
 	if len(semverTags) == 0 {
 
-		fmt.Println("No tags found, creating the first tag v0.0.0-DEV.1")
-		fmt.Println("::set-output name=new_tag::v0.0.0-DEV.1")
+		//tag := fmt.Sprintf("%02d%02d", currentYearStr, currentMonthStr)
+		//fmt.Printf("No tags found, creating the first tag %s\n", tag+"0.0-DEV.1")
+		//fmt.Printf("::set-output name=new_tag::%s\n", tag+"0.0-DEV.1")
+		//os.Exit(0)
+
+		fmt.Println("No tags found, creating the first tag" + currentTagDateName + ".0.0-DEV.1")
+		fmt.Println("::set-output name=new_tag::" + currentTagDateName + ".0.0-DEV.1")
 		os.Exit(0)
 	}
 
@@ -55,7 +63,7 @@ func main() {
 	latestTag := semverTags[len(semverTags)-1]
 
 	// Increment the tag
-	parts := strings.Split(strings.TrimPrefix(latestTag, "v"), "-")
+	parts := strings.Split(strings.TrimPrefix(latestTag, currentTagDateName), "-")
 	if len(parts) != 2 {
 		fmt.Println("Latest tag does not follow semantic versioning:", latestTag)
 		os.Exit(1)
@@ -70,13 +78,14 @@ func main() {
 	newTag := fmt.Sprintf("v%s-DEV.%d", parts[0], devNumber)
 
 	// Output the new tag to be used by other steps
-	fmt.Printf("::set-output name=new_tag::$(date +'%y%m.%d')%s\n", newTag)
+	fmt.Printf("::set-output name=new_tag::%s\n", newTag)
 }
 
 // versionCompare_RC compares two semantic versioning tags.
 func versionCompare(tag1, tag2 string) bool {
-	version1 := strings.TrimPrefix(tag1, "v")
-	version2 := strings.TrimPrefix(tag2, "v")
+	currenTagDateName := Xyz()
+	version1 := strings.TrimPrefix(tag1, currenTagDateName)
+	version2 := strings.TrimPrefix(tag2, currenTagDateName)
 
 	v1Parts := strings.Split(version1, "-")
 	v2Parts := strings.Split(version2, "-")
