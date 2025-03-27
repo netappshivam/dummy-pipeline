@@ -49,11 +49,6 @@ func main() {
 	// No tags found, start with initial version
 	if len(semverTags) == 0 {
 
-		//tag := fmt.Sprintf("%02d%02d", currentYearStr, currentMonthStr)
-		//fmt.Printf("No tags found, creating the first tag %s\n", tag+"0.0-DEV.1")
-		//fmt.Printf("::set-output name=new_tag::%s\n", tag+"0.0-DEV.1")
-		//os.Exit(0)
-
 		fmt.Println("No tags found, creating the first tag" + currentTagDateName + ".0.0-DEV.1")
 		fmt.Println("::set-output name=new_tag::" + currentTagDateName + ".0.0-DEV.1")
 		os.Exit(0)
@@ -75,7 +70,7 @@ func main() {
 	}
 	devNumber, _ := strconv.Atoi(devParts[1])
 	devNumber++
-	newTag := fmt.Sprintf("v%s-DEV.%d", parts[0], devNumber)
+	newTag := fmt.Sprintf(currentTagDateName+"%s-DEV.%d", parts[0], devNumber)
 
 	// Output the new tag to be used by other steps
 	fmt.Printf("::set-output name=new_tag::%s\n", newTag)
