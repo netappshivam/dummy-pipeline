@@ -7,6 +7,7 @@ on:
       - main
       - Go-git
       - release
+      - Go-Tag2
 
 jobs:
   tag-increment:
@@ -30,15 +31,18 @@ jobs:
 
       - name: Build increment_tag script for release
         if: contains(github.ref, 'release')
-        run: go build -o increment_tag ./rc.go
+        run: go build -o increment_tag rc.go common.go
 
       - name: Build increment_tag script for main
-        if: contains(github.ref, 'main')
-        run: go build -o increment_tag ./main.go
+        if: ${{ !contains(github.ref, 'release') }}
+        run: go build -o increment_tag dev.go common.go
 
       - name: Run increment_tag script
         id: increment_tag
-        run: ./increment_tag
+        run: |
+          echo ${{ github.ref }}
+          ls 
+          ./increment_tag
 
       - name: Configure Git
         run: |
