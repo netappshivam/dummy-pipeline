@@ -45,6 +45,7 @@ func main() {
 
 	// No tags found, start with initial version
 	if len(semverTags) == 0 {
+
 		fmt.Println("No tags found, creating the first tag v0.0.0-DEV.1")
 		fmt.Println("::set-output name=new_tag::v0.0.0-DEV.1")
 		os.Exit(0)
@@ -69,7 +70,7 @@ func main() {
 	newTag := fmt.Sprintf("v%s-DEV.%d", parts[0], devNumber)
 
 	// Output the new tag to be used by other steps
-	fmt.Printf("::set-output name=new_tag::%s\n", newTag)
+	fmt.Printf("::set-output name=new_tag::$(date +'%y%m.%d')%s\n", newTag)
 }
 
 // versionCompare_RC compares two semantic versioning tags.
