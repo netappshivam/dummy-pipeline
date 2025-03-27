@@ -22,7 +22,7 @@ func main() {
 	}
 
 	// Get all tag names
-	cmd = exec.Command("git", "tag", "--list", "v*-DEV.*")
+	cmd = exec.Command("git", "tag", "--list", currentTagDateName+"*-DEV.*")
 	output, err := cmd.Output()
 	if err != nil {
 		fmt.Println("Error listing tags:", err)
@@ -33,7 +33,7 @@ func main() {
 	// Filter tags that follow semantic versioning
 	semverTags := make([]string, 0)
 	for _, tag := range rawTags {
-		if strings.HasPrefix(tag, "v") {
+		if strings.HasPrefix(tag, currentTagDateName) {
 			parts := strings.Split(strings.TrimPrefix(tag, currentTagDateName), "-")
 			if len(parts) == 2 {
 				semverTags = append(semverTags, tag)
