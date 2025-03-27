@@ -69,7 +69,7 @@ func main() {
 	}
 	rcNumber, _ := strconv.Atoi(rcParts[1])
 	rcNumber++
-	newTag := fmt.Sprintf("v%s-RC.%d", parts[0], rcNumber)
+	newTag := fmt.Sprintf(currentTagDateName+"%s-RC.%d", parts[0], rcNumber)
 
 	// Output the new tag to be used by other steps
 	fmt.Printf("::set-output name=new_tag::%s\n", newTag)
