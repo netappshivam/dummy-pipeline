@@ -10,6 +10,9 @@ import (
 )
 
 func main() {
+
+	currentTagDateName := Xyz()
+
 	// Fetch all tags from the remote
 	cmd := exec.Command("git", "fetch", "--tags")
 	err := cmd.Run()
@@ -19,7 +22,7 @@ func main() {
 	}
 
 	// Get all tag names
-	cmd = exec.Command("git", "tag", "--list", "v*-RC.*")
+	cmd = exec.Command("git", "tag", "--list", currentTagDateName+"*-RC.*")
 	output, err := cmd.Output()
 	if err != nil {
 		fmt.Println("Error listing tags:", err)
@@ -30,8 +33,8 @@ func main() {
 	// Filter tags that follow semantic versioning
 	semverTags := make([]string, 0)
 	for _, tag := range rawTags {
-		if strings.HasPrefix(tag, "v") {
-			parts := strings.Split(strings.TrimPrefix(tag, "v"), "-")
+		if strings.HasPrefix(tag, currentTagDateName) {
+			parts := strings.Split(strings.TrimPrefix(tag, currentTagDateName), "-")
 			if len(parts) == 2 {
 				semverTags = append(semverTags, tag)
 			}
@@ -45,8 +48,8 @@ func main() {
 
 	// No tags found, start with initial version
 	if len(semverTags) == 0 {
-		fmt.Println("No tags found, creating the first tag v0.0.0-RC.1")
-		fmt.Println("::set-output name=new_tag::v0.0.0-RC.1")
+		fmt.Println("No tags found, creating the first tag" + currentTagDateName + ".0.0-RC.1")
+		fmt.Println("::set-output name=new_tag::" + currentTagDateName + ".0.0-RC.1")
 		os.Exit(0)
 	}
 
@@ -54,7 +57,7 @@ func main() {
 	latestTag := semverTags[len(semverTags)-1]
 
 	// Increment the tag
-	parts := strings.Split(strings.TrimPrefix(latestTag, "v"), "-")
+	parts := strings.Split(strings.TrimPrefix(latestTag, currentTagDateName), "-")
 	if len(parts) != 2 {
 		fmt.Println("Latest tag does not follow semantic versioning:", latestTag)
 		os.Exit(1)
@@ -74,8 +77,11 @@ func main() {
 
 // versionCompare_RC compares two semantic versioning tags.
 func versionCompare_RC(tag1, tag2 string) bool {
-	version1 := strings.TrimPrefix(tag1, "v")
-	version2 := strings.TrimPrefix(tag2, "v")
+
+	currentTagDateName := Xyz()
+
+	version1 := strings.TrimPrefix(tag1, currentTagDateName)
+	version2 := strings.TrimPrefix(tag2, currentTagDateName)
 
 	v1Parts := strings.Split(version1, "-")
 	v2Parts := strings.Split(version2, "-")
