@@ -34,7 +34,7 @@ jobs:
         run: go build -o increment_tag ./rc.go
 
       - name: Build increment_tag script for main
-        if: contains(github.ref, 'main')
+        if: !contains(github.ref, 'release')
         run: go build -o increment_tag ./main.go
 
       - name: Run increment_tag script
