@@ -48,7 +48,7 @@ func main() {
 
 	// No tags found, start with initial version
 	if len(semverTags) == 0 {
-		fmt.Println("No tags found, creating the first tag" + currentTagDateName + ".0.0-RC.1")
+		fmt.Println("No tags found, creating the first tag " + currentTagDateName + ".0.0-RC.1")
 		fmt.Println("::set-output name=new_tag::" + currentTagDateName + ".0.0-RC.1")
 		os.Exit(0)
 	}
