@@ -11,7 +11,7 @@ import (
 
 func main() {
 
-	TagHeaderName := Xyz()
+	TagHeaderName := TagHeaderFunc()
 
 	// Fetch all tags from the remote
 	cmd := exec.Command("git", "fetch", "--tags")
@@ -78,9 +78,9 @@ func main() {
 
 // versionCompare_RC compares two semantic versioning tags.
 func versionCompare(tag1, tag2 string) bool {
-	currenTagDateName := Xyz()
-	version1 := strings.TrimPrefix(tag1, currenTagDateName)
-	version2 := strings.TrimPrefix(tag2, currenTagDateName)
+	currentHeadName := TagHeaderFunc()
+	version1 := strings.TrimPrefix(tag1, currentHeadName)
+	version2 := strings.TrimPrefix(tag2, currentHeadName)
 
 	v1Parts := strings.Split(version1, "-")
 	v2Parts := strings.Split(version2, "-")

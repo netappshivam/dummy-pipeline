@@ -31,11 +31,11 @@ jobs:
 
       - name: Build increment_tag script for release
         if: contains(github.ref, 'release')
-        run: go build -o increment_tag rc.go common.go
+        run: go build -o increment_tag rc.go commonTagHeaderName.go
 
       - name: Build increment_tag script for main
         if: ${{ !contains(github.ref, 'release') }}
-        run: go build -o increment_tag dev.go common.go
+        run: go build -o increment_tag dev.go commonTagHeaderName.go
 
       - name: Run increment_tag script
         id: increment_tag
