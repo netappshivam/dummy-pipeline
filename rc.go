@@ -11,7 +11,7 @@ import (
 
 func main() {
 
-	currentTagDateName := Xyz()
+	TagHeaderName := TagHeaderFunc()
 
 	// Fetch all tags from the remote
 	cmd := exec.Command("git", "fetch", "--tags")
@@ -22,7 +22,7 @@ func main() {
 	}
 
 	// Get all tag names
-	cmd = exec.Command("git", "tag", "--list", currentTagDateName+"*-RC.*")
+	cmd = exec.Command("git", "tag", "--list", TagHeaderName+"*-RC.*")
 	output, err := cmd.Output()
 	if err != nil {
 		fmt.Println("Error listing tags:", err)
@@ -33,8 +33,8 @@ func main() {
 	// Filter tags that follow semantic versioning
 	semverTags := make([]string, 0)
 	for _, tag := range rawTags {
-		if strings.HasPrefix(tag, currentTagDateName) {
-			parts := strings.Split(strings.TrimPrefix(tag, currentTagDateName), "-")
+		if strings.HasPrefix(tag, TagHeaderName) {
+			parts := strings.Split(strings.TrimPrefix(tag, TagHeaderName), "-")
 			if len(parts) == 2 {
 				semverTags = append(semverTags, tag)
 			}
@@ -48,8 +48,8 @@ func main() {
 
 	// No tags found, start with initial version
 	if len(semverTags) == 0 {
-		fmt.Println("No tags found, creating the first tag " + currentTagDateName + ".0.0-RC.1")
-		fmt.Println("::set-output name=new_tag::" + currentTagDateName + ".0.0-RC.1")
+		fmt.Println("No tags found, creating the first tag" + TagHeaderName + ".0.0-RC.1")
+		fmt.Println("::set-output name=new_tag::" + TagHeaderName + ".0.0-RC.1")
 		os.Exit(0)
 	}
 
@@ -57,7 +57,7 @@ func main() {
 	latestTag := semverTags[len(semverTags)-1]
 
 	// Increment the tag
-	parts := strings.Split(strings.TrimPrefix(latestTag, currentTagDateName), "-")
+	parts := strings.Split(strings.TrimPrefix(latestTag, TagHeaderName), "-")
 	if len(parts) != 2 {
 		fmt.Println("Latest tag does not follow semantic versioning:", latestTag)
 		os.Exit(1)
@@ -69,7 +69,7 @@ func main() {
 	}
 	rcNumber, _ := strconv.Atoi(rcParts[1])
 	rcNumber++
-	newTag := fmt.Sprintf(currentTagDateName+"%s-RC.%d", parts[0], rcNumber)
+	newTag := fmt.Sprintf("v%s-RC.%d", parts[0], rcNumber)
 
 	// Output the new tag to be used by other steps
 	fmt.Printf("::set-output name=new_tag::%s\n", newTag)
@@ -78,7 +78,7 @@ func main() {
 // versionCompare_RC compares two semantic versioning tags.
 func versionCompare_RC(tag1, tag2 string) bool {
 
-	currentTagDateName := Xyz()
+	currentTagDateName := TagHeaderFunc()
 
 	version1 := strings.TrimPrefix(tag1, currentTagDateName)
 	version2 := strings.TrimPrefix(tag2, currentTagDateName)
