@@ -40,8 +40,6 @@ jobs:
       - name: Run increment_tag script
         id: increment_tag
         run: |
-          echo ${{ github.ref }}
-          ls 
           ./increment_tag
 
       - name: Configure Git

@@ -11,7 +11,7 @@ import (
 
 func main() {
 
-	currentTagDateName := Xyz()
+	TagHeaderName := Xyz()
 
 	// Fetch all tags from the remote
 	cmd := exec.Command("git", "fetch", "--tags")
@@ -22,7 +22,7 @@ func main() {
 	}
 
 	// Get all tag names
-	cmd = exec.Command("git", "tag", "--list", currentTagDateName+"*-DEV.*")
+	cmd = exec.Command("git", "tag", "--list", TagHeaderName+"*-DEV.*")
 	output, err := cmd.Output()
 	if err != nil {
 		fmt.Println("Error listing tags:", err)
@@ -33,8 +33,8 @@ func main() {
 	// Filter tags that follow semantic versioning
 	semverTags := make([]string, 0)
 	for _, tag := range rawTags {
-		if strings.HasPrefix(tag, currentTagDateName) {
-			parts := strings.Split(strings.TrimPrefix(tag, currentTagDateName), "-")
+		if strings.HasPrefix(tag, TagHeaderName) {
+			parts := strings.Split(strings.TrimPrefix(tag, TagHeaderName), "-")
 			if len(parts) == 2 {
 				semverTags = append(semverTags, tag)
 			}
@@ -49,8 +49,8 @@ func main() {
 	// No tags found, start with initial version
 	if len(semverTags) == 0 {
 
-		fmt.Println("No tags found, creating the first tag" + currentTagDateName + ".0.0-DEV.1")
-		fmt.Println("::set-output name=new_tag::" + currentTagDateName + ".0.0-DEV.1")
+		fmt.Println("No tags found, creating the first tag" + TagHeaderName + ".0.0-DEV.1")
+		fmt.Println("::set-output name=new_tag::" + TagHeaderName + ".0.0-DEV.1")
 		os.Exit(0)
 	}
 
@@ -58,7 +58,7 @@ func main() {
 	latestTag := semverTags[len(semverTags)-1]
 
 	// Increment the tag
-	parts := strings.Split(strings.TrimPrefix(latestTag, currentTagDateName), "-")
+	parts := strings.Split(strings.TrimPrefix(latestTag, TagHeaderName), "-")
 	if len(parts) != 2 {
 		fmt.Println("Latest tag does not follow semantic versioning:", latestTag)
 		os.Exit(1)
@@ -70,7 +70,7 @@ func main() {
 	}
 	devNumber, _ := strconv.Atoi(devParts[1])
 	devNumber++
-	newTag := fmt.Sprintf(currentTagDateName+"%s-DEV.%d", parts[0], devNumber)
+	newTag := fmt.Sprintf(TagHeaderName+"%s-DEV.%d", parts[0], devNumber)
 
 	// Output the new tag to be used by other steps
 	fmt.Printf("::set-output name=new_tag::%s\n", newTag)
