@@ -49,6 +49,11 @@ jobs:
           git config --global user.email "Shivam.Bisht@netapp.com"
           git config --global user.name "netappshivam"
 
+      - name: release branch
+        uses: netappshivam/dummy_branch_creation
+        with:
+          new_release_branch_name: ${{ steps.increment_tag.outputs.new_tag }}
+
       - name: Create and push new tag
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
