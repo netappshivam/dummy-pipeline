@@ -1,0 +1,34 @@
+name: branch creation
+
+on:
+  workflow_call:
+  repository_dispatch:
+
+
+jobs:
+  checkout:
+    name: Checkout create-release-branches repo
+    uses: actions/checkout@v2
+    with:
+      repository: netappshivam/dummy-pipeline
+      path: ./dummy-pipeline/
+
+  create_branches:
+    name: Create Branches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          PATH="$PATH:/github/home/.local/bin"
+          pip3 install shyaml
+
+      - name: Copy scripts
+        run: |
+          cp ./dummy-pipeline/release_create.sh .
+
+      - name: Create release branch
+        run: ./release_create.sh ${{ steps.increment_tag.outputs.new_tag }}
+        shell: bash
