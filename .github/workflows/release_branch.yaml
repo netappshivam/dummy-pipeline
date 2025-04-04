@@ -8,13 +8,16 @@ on:
 jobs:
 
   create_branches:
-    permissions:
-      contents: write  # Allow read and write access to the repository contents
-      actions: read
-      packages: write
+
 
     name: Create Branches
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      actions: read
+      packages: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
