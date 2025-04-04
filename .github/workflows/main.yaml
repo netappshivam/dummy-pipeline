@@ -32,7 +32,9 @@ jobs:
 
       - name: Build increment_tag script for release
         if: contains(github.ref, 'release')
-        run: go build -o increment_tag rc.go common.go
+        run: |
+          go build -o increment_tag rc.go common.go
+          go build -o release_create ./release/release_create.go
 
       - name: Build increment_tag script for main
         if: ${{ !contains(github.ref, 'release') }}
@@ -41,26 +43,13 @@ jobs:
       - name: Run increment_tag script
         id: increment_tag
         run: |
-          echo ${{ github.ref }}
-          ls 
           ./increment_tag
+          ./release_create ${{ steps.increment_tag.outputs.new_tag }}
 
       - name: Configure Git
         run: |
           git config --global user.email "Shivam.Bisht@netapp.com"
           git config --global user.name "netappshivam"
-          
-          
-
-      - name: Build release_create.go
-        run: go build -o release_create ./release/release_create.go
-
-      - name: Set execute permissions for release_create
-        run: chmod +x ./release_create
-
-      - name: Create release branch
-        run: ./release_create ${{ steps.increment_tag.outputs.new_tag }}
-
 
       - name: Create and push new tag
         env:
