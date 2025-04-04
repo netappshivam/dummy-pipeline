@@ -53,7 +53,7 @@ jobs:
           
 
       - name: Build release_create.go
-        run: go build -o release_create ./dummy-pipeline/release/release_create.go
+        run: go build -o release_create ./release/release_create.go
 
       - name: Create release branch
         run: ./release_create ${{ steps.increment_tag.outputs.new_tag }}
