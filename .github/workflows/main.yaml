@@ -50,6 +50,9 @@ jobs:
           git config --global user.email "Shivam.Bisht@netapp.com"
           git config --global user.name "netappshivam"
 
+      - name: Set execute permissions for release_branch.yaml
+        run: chmod +x ./.github/workflows/release_branch.yaml
+
       - name: release branch
         run: ./.github/workflows/release_branch.yaml
 
