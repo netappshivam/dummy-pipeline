@@ -36,12 +36,13 @@ jobs:
           go build -o increment_tag rc.go common.go
           go build -o release_create ./release/release_create.go
 
+      - name: Set execute permissions for release_create
+        run: chmod +x ./release_create
+
       - name: Build increment_tag script for main
         if: ${{ !contains(github.ref, 'release') }}
         run: go build -o increment_tag dev.go common.go
 
-      - name: Set execute permissions for release_create
-        run: chmod +x ./release_create
 
       - name: Run increment_tag script
         id: increment_tag
