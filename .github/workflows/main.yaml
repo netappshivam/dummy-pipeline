@@ -34,7 +34,7 @@ jobs:
         if: contains(github.ref, 'release')
         run: |
           go build -o increment_tag rc.go common.go
-          go build -o release_create ./release/release_create.go
+          go build -o release_create release/release_create.go
 
       - name: Set execute permissions for release_create
         run: chmod +x ./release_create
