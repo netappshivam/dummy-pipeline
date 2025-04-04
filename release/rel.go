@@ -15,9 +15,8 @@ func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("new_release_branch_name argument is required")
 	}
-	newReleaseBranchName := os.Args[1]
 
-	lastTag := newReleaseBranchName
+	lastTag := "2501.0.0-RC.1"
 
 	if lastTag != "" {
 		fmt.Printf("Latest and greatest tag is: %s\n", lastTag)
