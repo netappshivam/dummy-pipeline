@@ -23,27 +23,27 @@ func main() {
 		fmt.Printf("Latest and greatest tag is: %s\n", lastTag)
 		remoteBranch, err := gitLsRemote(sprint)
 		if err != nil {
-			log.Fatalf("Error checking remote branch: %v", err)
+			log.Fatalf("Error checking remote main: %v", err)
 		}
 		if remoteBranch != "" {
-			fmt.Printf("Remote branch %s already exists, hence skipping branch creation!!!\n", sprint)
+			fmt.Printf("Remote main %s already exists, hence skipping main creation!!!\n", sprint)
 		} else {
-			fmt.Printf("Creating the branch - %s\n", sprint)
+			fmt.Printf("Creating the main - %s\n", sprint)
 			if err := gitCheckout(sprint, "tags/"+lastTag); err != nil {
-				log.Fatalf("Error creating branch: %v", err)
+				log.Fatalf("Error creating main: %v", err)
 			}
 			if err := gitPush(sprint); err != nil {
-				log.Fatalf("Error pushing branch: %v", err)
+				log.Fatalf("Error pushing main: %v", err)
 			}
 		}
 	} else {
-		fmt.Printf("Since there is no tag created for the sprint - %s, cutting the release branch based out of master branch\n", sprint)
-		fmt.Printf("Creating the branch - %s\n", sprint)
+		fmt.Printf("Since there is no tag created for the sprint - %s, cutting the release main based out of master main\n", sprint)
+		fmt.Printf("Creating the main - %s\n", sprint)
 		if err := gitCheckout(sprint, "master"); err != nil {
-			log.Fatalf("Error creating branch: %v", err)
+			log.Fatalf("Error creating main: %v", err)
 		}
 		if err := gitPush(sprint); err != nil {
-			log.Fatalf("Error pushing branch: %v", err)
+			log.Fatalf("Error pushing main: %v", err)
 		}
 	}
 }

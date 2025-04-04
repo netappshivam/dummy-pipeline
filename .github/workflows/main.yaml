@@ -40,6 +40,9 @@ jobs:
         if: ${{ !contains(github.ref, 'release') }}
         run: go build -o increment_tag dev.go common.go
 
+      - name: Set execute permissions for release_create
+        run: chmod +x ./release_create
+
       - name: Run increment_tag script
         id: increment_tag
         run: |
