@@ -6,19 +6,13 @@ on:
 
 
 jobs:
-  checkout:
-    name: Checkout create-release-branches repo
-    uses: actions/checkout@v2
-    with:
-      repository: netappshivam/dummy-pipeline
-      path: ./dummy-pipeline/
 
   create_branches:
     name: Create Branches
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install dependencies
         run: |

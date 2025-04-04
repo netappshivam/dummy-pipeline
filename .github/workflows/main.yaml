@@ -10,6 +10,13 @@ on:
       - Go-Tag2
 
 jobs:
+  checkout:
+    name: Checkout create-release-branches repo
+    uses: actions/checkout@v2
+    with:
+      repository: netappshivam/dummy-pipeline
+      path: ./dummy-pipeline/
+
   tag-increment:
     runs-on: ubuntu-latest
 
@@ -48,9 +55,6 @@ jobs:
         run: |
           git config --global user.email "Shivam.Bisht@netapp.com"
           git config --global user.name "netappshivam"
-
-      - name: Checkout repository
-        uses: actions/checkout@v3
 
       - name: release branch
         uses: ./.github/workflows/release_branch.yaml
