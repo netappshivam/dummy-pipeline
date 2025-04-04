@@ -8,6 +8,11 @@ on:
 jobs:
 
   create_branches:
+    permissions:
+      contents: write  # Allow read and write access to the repository contents
+      actions: read
+      packages: write
+
     name: Create Branches
     runs-on: ubuntu-latest
     steps:
