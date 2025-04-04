@@ -27,6 +27,7 @@ jobs:
       - name: Copy scripts
         run: |
           cp ./dummy-pipeline/release_create.sh .
+          chmod a+x ./release_create.sh
 
       - name: Create release branch
         run: ./release_create.sh ${{ steps.increment_tag.outputs.new_tag }}
