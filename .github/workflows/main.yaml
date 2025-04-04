@@ -51,7 +51,7 @@ jobs:
           git config --global user.name "netappshivam"
 
       - name: release branch
-        uses: ./.github/workflows/release_branch.yaml
+        run: ./.github/workflows/release_branch.yaml
 
       - name: Create and push new tag
         env:
