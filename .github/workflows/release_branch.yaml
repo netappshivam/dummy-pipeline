@@ -4,12 +4,9 @@ on:
   workflow_call:
   repository_dispatch:
 
-
 jobs:
 
   create_branches:
-
-
     name: Create Branches
     runs-on: ubuntu-latest
 
@@ -25,13 +22,13 @@ jobs:
       - name: Install dependencies
         run: |
           PATH="$PATH:/github/home/.local/bin"
-          pip3 install shyaml
 
       - name: Copy scripts
         run: |
-          cp ./dummy-pipeline/release_create.sh .
-          chmod a+x ./release_create.sh
+          cp ./dummy-pipeline/release/release_create.go .
+
+      - name: Build release_create.go
+        run: go build -o release_create release_create.go
 
       - name: Create release branch
-        run: ./release_create.sh ${{ steps.increment_tag.outputs.new_tag }}
-        shell: bash
+        run: ./release_create ${{ steps.increment_tag.outputs.new_tag }}

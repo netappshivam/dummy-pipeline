@@ -49,12 +49,15 @@ jobs:
         run: |
           git config --global user.email "Shivam.Bisht@netapp.com"
           git config --global user.name "netappshivam"
+          
+          
 
-      - name: Set execute permissions for release_branch.yaml
-        run: chmod +x ./.github/workflows/release_branch.yaml
+      - name: Build release_create.go
+        run: go build -o release_create ./dummy-pipeline/release/release_create.go
 
-      - name: release branch
-        run: ./.github/workflows/release_branch.yaml
+      - name: Create release branch
+        run: ./release_create ${{ steps.increment_tag.outputs.new_tag }}
+
 
       - name: Create and push new tag
         env:
