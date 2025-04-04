@@ -10,12 +10,6 @@ on:
       - Go-Tag2
 
 jobs:
-  checkout:
-    name: Checkout create-release-branches repo
-    uses: actions/checkout@v2
-    with:
-      repository: netappshivam/dummy-pipeline
-      path: ./dummy-pipeline/
 
   tag-increment:
     runs-on: ubuntu-latest
