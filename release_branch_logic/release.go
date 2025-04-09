@@ -29,6 +29,11 @@ func Release_creation() {
 
 	} else {
 		//if it does not exist, then creating a new branch for that weekly release
+		err := cleanWorkingDirectory()
+		if err != nil {
+			log.Fatalf("Error cleaning working directory: %v", err)
+		}
+
 		latestSprintTag := "release." + sprint
 
 		fmt.Printf("Since there is no tag created for the sprint - %s, cutting the release main based out of master main\n", sprint)
@@ -67,4 +72,25 @@ func FetchReleaseBranch(sprint string) (string, error) {
 		return "", nil
 	}
 	return branch, nil
+}
+
+func cleanWorkingDirectory() error {
+	// Discard local changes
+	cmdReset := exec.Command("git", "reset", "--hard")
+	cmdReset.Stdout = os.Stdout
+	cmdReset.Stderr = os.Stderr
+	if err := cmdReset.Run(); err != nil {
+		return fmt.Errorf("failed to reset changes: %w", err)
+	}
+
+	// Remove untracked files and directories
+	cmdClean := exec.Command("git", "clean", "-fd")
+	cmdClean.Stdout = os.Stdout
+	cmdClean.Stderr = os.Stderr
+	if err := cmdClean.Run(); err != nil {
+		return fmt.Errorf("failed to clean untracked files: %w", err)
+	}
+
+	fmt.Println("Working directory cleaned successfully.")
+	return nil
 }
