@@ -20,10 +20,12 @@ func Release_creation() {
 
 	//if it does exists, then finding the latest branch tag and incrementing it
 	if last_branch != "" {
-		lastTag := LatestTagFetch("RC", setupConfig.current_week_release)
+		lastTag := LatestTagFetch("RC")
 		fmt.Printf("Latest and greatest tag is: %s\n", lastTag)
 
-		incrementTag(lastTag)
+		newTag, _ := incrementTag(lastTag)
+
+		SetNewTag(newTag)
 
 		//logic here
 
@@ -44,6 +46,7 @@ func Release_creation() {
 		if err := gitPush(latestSprintTag); err != nil {
 			log.Fatalf("Error pushing main: %v", err)
 		}
+		SetNewTag(sprint + ".0.0-RC.1")
 	}
 }
 

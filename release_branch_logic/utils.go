@@ -56,6 +56,10 @@ func fetchTags() error {
 	return nil
 }
 
+func SetNewTag(newTag string) {
+	fmt.Printf("::set-output name=new_tag::%s\n", newTag)
+}
+
 //func loadYaml(filepath string) error {
 //	file, err := os.Open(filepath)
 //	if err != nil {

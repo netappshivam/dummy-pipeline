@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func LatestTagFetch(typeOfTag string, header string) string {
+func LatestTagFetch(typeOfTag string) string {
 
 	currentTagHeader := setupConfig.current_week_release
 
@@ -22,9 +22,9 @@ func LatestTagFetch(typeOfTag string, header string) string {
 
 	// Define the tag pattern to match
 	if typeOfTag == "RC" {
-		tagPattern = currentTagHeader + header + "*-RC.*"
+		tagPattern = currentTagHeader + "*-RC.*"
 	} else if typeOfTag == "DEV" {
-		tagPattern = currentTagHeader + header + "*-DEV.*"
+		tagPattern = currentTagHeader + "*-DEV.*"
 	}
 
 	// Execute the git command to list tags sorted by version (descending)
