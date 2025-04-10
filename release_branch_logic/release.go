@@ -25,13 +25,15 @@ func Release_creation() {
 
 		newTag, _ := incrementTag(lastTag)
 
+		GitOnlyCheckout("release." + sprint)
+
 		SetNewTag(newTag)
 
 		//logic here
 
 	} else {
 		//if it does not exist, then creating a new branch for that weekly release
-		err := cleanWorkingDirectory()
+		err := CleanWorkingDirectory()
 		if err != nil {
 			log.Fatalf("Error cleaning working directory: %v", err)
 		}
@@ -40,24 +42,31 @@ func Release_creation() {
 
 		fmt.Printf("Since there is no tag created for the sprint - %s, cutting the release main based out of master main\n", sprint)
 		fmt.Printf("Creating the main - %s\n", sprint)
-		if err := gitCheckout(latestSprintTag, "origin/main"); err != nil {
+		if err := GitCheckout(latestSprintTag, "origin/main"); err != nil {
 			log.Fatalf("Error creating main: %v", err)
 		}
-		if err := gitPush(latestSprintTag); err != nil {
+		if err := GitPush(latestSprintTag); err != nil {
 			log.Fatalf("Error pushing main: %v", err)
 		}
 		SetNewTag(sprint + ".0.0-RC.1")
 	}
 }
 
-func gitCheckout(branch, ref string) error {
+func GitCheckout(branch, ref string) error {
 	cmd := exec.Command("git", "checkout", "-b", branch, ref)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }
 
-func gitPush(branch string) error {
+func GitOnlyCheckout(branch string) error {
+	cmd := exec.Command("git", "checkout", branch)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func GitPush(branch string) error {
 	cmd := exec.Command("git", "push", "origin", branch)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -77,7 +86,7 @@ func FetchReleaseBranch(sprint string) (string, error) {
 	return branch, nil
 }
 
-func cleanWorkingDirectory() error {
+func CleanWorkingDirectory() error {
 	// Discard local changes
 	cmdReset := exec.Command("git", "reset", "--hard")
 	cmdReset.Stdout = os.Stdout

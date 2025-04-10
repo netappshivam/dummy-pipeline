@@ -20,7 +20,7 @@ var setupConfig SetupConfig
 func IntializeData() {
 
 	//loadYaml("release.yaml")
-	setupConfig.current_week_release = "2515"
+	setupConfig.current_week_release = "2517"
 	setupConfig.next_week_release = "2516"
 
 }
