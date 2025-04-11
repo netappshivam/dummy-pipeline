@@ -11,8 +11,8 @@ import (
 )
 
 type SetupConfig struct {
-	CurrentWeekRelease string `yaml:"current_week_release"`
-	NextWeekRelease    string `yaml:"next_week_release"`
+	CurrentWeekRelease string `yaml:"current_weekly_release"`
+	NextWeekRelease    string `yaml:"next_weekly_release"`
 }
 
 var setupConfig SetupConfig
