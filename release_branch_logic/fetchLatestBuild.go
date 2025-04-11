@@ -9,7 +9,7 @@ import (
 
 func LatestTagFetch(typeOfTag string) string {
 
-	currentTagHeader := setupConfig.current_week_release
+	currentTagHeader := setupConfig.CurrentWeekRelease
 
 	// Fetch the latest tags from the remote repository
 	err := fetchTags()

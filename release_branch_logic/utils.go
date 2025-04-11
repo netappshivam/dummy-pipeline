@@ -2,6 +2,10 @@ package release_branch_logic
 
 import (
 	"fmt"
+	"gopkg.in/yaml.v2"
+	"io"
+	"os"
+
 	//"gopkg.in/yaml.v2"
 	//"io"
 	//"os"
@@ -11,17 +15,15 @@ import (
 )
 
 type SetupConfig struct {
-	current_week_release string
-	next_week_release    string
+	CurrentWeekRelease string `yaml:"current_week_release"`
+	NextWeekRelease    string `yaml:"next_week_release"`
 }
 
 var setupConfig SetupConfig
 
 func IntializeData() {
 
-	//loadYaml("release.yaml")
-	setupConfig.current_week_release = "2517"
-	setupConfig.next_week_release = "2516"
+	loadYaml("release.yaml")
 
 }
 
@@ -60,20 +62,75 @@ func SetNewTag(newTag string) {
 	fmt.Printf("::set-output name=new_tag::%s\n", newTag)
 }
 
-//func loadYaml(filepath string) error {
-//	file, err := os.Open(filepath)
-//	if err != nil {
-//		return fmt.Errorf("error opening .yaml file: %v", err)
-//	}
-//	defer file.Close()
-//	data, err := io.ReadAll(file)
-//	if err != nil {
-//		return fmt.Errorf("error reading .yaml file: %v", err)
-//	}
-//
-//	err = yaml.Unmarshal(data, &setupConfig)
-//	if err != nil {
-//		return fmt.Errorf("error unmarshalling .yaml file: %v", err)
-//	}
-//	return nil
-//}
+func GitCheckout(branch, ref string) error {
+	cmd := exec.Command("git", "checkout", "-b", branch, ref)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func GitOnlyCheckout(branch string) error {
+	cmd := exec.Command("git", "checkout", branch)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func GitPush(branch string) error {
+	cmd := exec.Command("git", "push", "origin", branch)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func FetchReleaseBranch(sprint string) (string, error) {
+	cmd := exec.Command("git", "branch", "-r", "--list", "origin/release."+sprint)
+	output, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+	branch := strings.TrimSpace(string(output))
+	if branch == "" {
+		return "", nil
+	}
+	return branch, nil
+}
+
+func CleanWorkingDirectory() error {
+	// Discard local changes
+	cmdReset := exec.Command("git", "reset", "--hard")
+	cmdReset.Stdout = os.Stdout
+	cmdReset.Stderr = os.Stderr
+	if err := cmdReset.Run(); err != nil {
+		return fmt.Errorf("failed to reset changes: %w", err)
+	}
+
+	// Remove untracked files and directories
+	cmdClean := exec.Command("git", "clean", "-fd")
+	cmdClean.Stdout = os.Stdout
+	cmdClean.Stderr = os.Stderr
+	if err := cmdClean.Run(); err != nil {
+		return fmt.Errorf("failed to clean untracked files: %w", err)
+	}
+
+	fmt.Println("Working directory cleaned successfully.")
+	return nil
+}
+
+func loadYaml(filepath string) error {
+	file, err := os.Open(filepath)
+	if err != nil {
+		return fmt.Errorf("error opening .yaml file: %v", err)
+	}
+	defer file.Close()
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return fmt.Errorf("error reading .yaml file: %v", err)
+	}
+
+	err = yaml.Unmarshal(data, &setupConfig)
+	if err != nil {
+		return fmt.Errorf("error unmarshalling .yaml file: %v", err)
+	}
+	return nil
+}

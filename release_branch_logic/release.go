@@ -3,13 +3,10 @@ package release_branch_logic
 import (
 	"fmt"
 	"log"
-	"os"
-	"os/exec"
-	"strings"
 )
 
 func Release_creation() {
-	sprint := setupConfig.current_week_release
+	sprint := setupConfig.CurrentWeekRelease
 	fmt.Printf("Creating %s Branch\n", sprint)
 
 	// finding if a branch exists for a weekly release
@@ -28,8 +25,6 @@ func Release_creation() {
 		GitOnlyCheckout("release." + sprint)
 
 		SetNewTag(newTag)
-
-		//logic here
 
 	} else {
 		//if it does not exist, then creating a new branch for that weekly release
@@ -50,59 +45,4 @@ func Release_creation() {
 		}
 		SetNewTag(sprint + ".0.0-RC.1")
 	}
-}
-
-func GitCheckout(branch, ref string) error {
-	cmd := exec.Command("git", "checkout", "-b", branch, ref)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
-}
-
-func GitOnlyCheckout(branch string) error {
-	cmd := exec.Command("git", "checkout", branch)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
-}
-
-func GitPush(branch string) error {
-	cmd := exec.Command("git", "push", "origin", branch)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
-}
-
-func FetchReleaseBranch(sprint string) (string, error) {
-	cmd := exec.Command("git", "branch", "-r", "--list", "origin/release."+sprint)
-	output, err := cmd.Output()
-	if err != nil {
-		return "", err
-	}
-	branch := strings.TrimSpace(string(output))
-	if branch == "" {
-		return "", nil
-	}
-	return branch, nil
-}
-
-func CleanWorkingDirectory() error {
-	// Discard local changes
-	cmdReset := exec.Command("git", "reset", "--hard")
-	cmdReset.Stdout = os.Stdout
-	cmdReset.Stderr = os.Stderr
-	if err := cmdReset.Run(); err != nil {
-		return fmt.Errorf("failed to reset changes: %w", err)
-	}
-
-	// Remove untracked files and directories
-	cmdClean := exec.Command("git", "clean", "-fd")
-	cmdClean.Stdout = os.Stdout
-	cmdClean.Stderr = os.Stderr
-	if err := cmdClean.Run(); err != nil {
-		return fmt.Errorf("failed to clean untracked files: %w", err)
-	}
-
-	fmt.Println("Working directory cleaned successfully.")
-	return nil
 }
