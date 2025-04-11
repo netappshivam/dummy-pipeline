@@ -5,10 +5,6 @@ import (
 	"gopkg.in/yaml.v2"
 	"io"
 	"os"
-
-	//"gopkg.in/yaml.v2"
-	//"io"
-	//"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -21,9 +17,9 @@ type SetupConfig struct {
 
 var setupConfig SetupConfig
 
-func IntializeData() {
+func init() {
 
-	loadYaml("release.yaml")
+	loadYaml("./releases.yaml")
 
 }
 
