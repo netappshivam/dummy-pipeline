@@ -30,6 +30,7 @@ jobs:
           chmod +x ./cicd/dev_logic_binary
 
       - name: Run dev logic
+        id: increment_tag
         run: ./cicd/dev_logic_binary dev
 
       - name: Configure Git
@@ -68,6 +69,7 @@ jobs:
           chmod +x ./cicd/release_logic_binary
 
       - name: Run release logic
+        id: increment_tag
         run: ./cicd/release_logic_binary release
 
       - name: Configure Git
@@ -79,6 +81,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          NEW_TAG=${{ steps.increment_tag.outputs.newTag }}
+          NEW_TAG=${{ steps.increment_tag.outputs.new_tag }}
           git tag $TAG_NAME
           git push origin $TAG_NAME
