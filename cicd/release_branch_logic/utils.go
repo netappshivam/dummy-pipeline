@@ -53,6 +53,15 @@ func FetchTags() error {
 	return nil
 }
 
+func FetchTagsPrune() error {
+	cmd := exec.Command("git", "fetch", "--prune")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("failed to fetch tags: %s, output: %s", err, string(output))
+	}
+	return nil
+}
+
 func GitCheckout(branch, ref string) error {
 	cmd := exec.Command("git", "checkout", "-b", branch, ref)
 	cmd.Stdout = os.Stdout

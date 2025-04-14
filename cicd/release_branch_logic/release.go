@@ -10,6 +10,8 @@ func Release_creation() {
 	fmt.Printf("Checking if branch exists for release-->", sprint)
 
 	// finding if a branch exists for a weekly release
+	FetchTagsPrune()
+	FetchTags()
 	last_branch, err := FetchReleaseBranch(sprint)
 	if err != nil {
 		log.Fatalf("Error fetching release branch: %v", err)
