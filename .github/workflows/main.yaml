@@ -83,6 +83,6 @@ jobs:
 
       - name: Set Tag
         run: |
-          NEW_TAG=${{ steps.release_logic_binary.outputs.newTag1 }}
-          git tag $TAG_NAME
-          git push origin $TAG_NAME
+          NEW_TAG=${{ steps.release_logic_binary.outputs.new_tag }}
+          git tag $NEW_TAG
+          git push origin $NEW_TAG

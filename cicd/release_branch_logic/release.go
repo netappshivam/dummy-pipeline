@@ -19,12 +19,6 @@ func Release_creation() {
 
 	//if it does exists, then finding the latest branch tag and incrementing it
 	if last_branch != "" {
-		lastTag := LatestTagFetch("RC")
-		fmt.Printf("Latest and greatest tag is: %s\n", lastTag)
-
-		newTag, _ := IncrementTag(lastTag)
-		fmt.Printf("New tag is: %s\n", newTag)
-
 		err := CleanWorkingDirectory()
 		if err != nil {
 			log.Fatalf("Error cleaning working directory: %v", err)
@@ -34,6 +28,13 @@ func Release_creation() {
 		if err2 != nil {
 			log.Fatalf("Error checking out release branch: %v", err2)
 		}
+
+		lastTag := LatestTagFetch("RC")
+		fmt.Printf("Latest and greatest tag is: %s\n", lastTag)
+
+		newTag, _ := IncrementTag(lastTag)
+		fmt.Printf("New tag is: %s\n", newTag)
+		fmt.Printf("::set-output name=new_tag::%s\n", newTag)
 
 	} else {
 		//if it does not exist, then creating a new branch for that weekly release

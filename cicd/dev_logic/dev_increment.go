@@ -19,7 +19,7 @@ func Dev_increment_logic() {
 
 	newTag, _ := release_branch_logic.IncrementTag(lastTag)
 	if len(newTag) == 0 {
-		newTag = fmt.Sprintf(release_branch_logic.SetupConfigobject.CurrentWeekRelease + ".0.0-DEV.1")
+		newTag = release_branch_logic.SetupConfigobject.CurrentWeekRelease + ".0.0-DEV.1"
 	}
 
 	fmt.Printf("::set-output name=newTag1::%s\n", newTag)
