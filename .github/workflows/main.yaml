@@ -43,8 +43,6 @@ jobs:
             git config --global user.name "netappshivam"
 
       - name: Set Tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           NEW_TAG=${{ steps.abcd.outputs.newTag1 }}
           echo "New tag: $NEW_TAG"
@@ -85,8 +83,6 @@ jobs:
             git config --global user.name "netappshivam"
 
       - name: Set Tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           NEW_TAG=${{ steps.release_logic_binary.outputs.newTag1 }}
           git tag $TAG_NAME

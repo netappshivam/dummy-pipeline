@@ -41,7 +41,6 @@ func LatestTagFetch(typeOfTag string) string {
 	// Check if any tags were found
 	if len(tags) == 0 || tags[0] == "" {
 		fmt.Println("No tags found matching the pattern:", tagPattern)
-		os.Exit(0)
 	}
 
 	// The first tag in the sorted output is the latest
