@@ -1,56 +1,67 @@
-name: Go Tag Increment
-
+name: Main Workflow
 on:
   push:
     branches:
-      - master
       - main
-      - Go-git
-      - release
-      - Go-Tag2
+      - release.*
+  pull_request:
+
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
-  tag-increment:
-    runs-on: ubuntu-latest
 
-    permissions:
-      contents: write  # Allow read and write access to the repository contents
-      actions: read
-      packages: write  # Add this line to allow pushing tags
+  dev_increment:
+    runs-on: [ ubuntu-22.04 ]
+    container:
+      image: ghcr.io/vcp-vsa-control-plane/vsactl:v1
+      options: -v /var/run/docker.sock:/var/run/docker.sock --user root
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Fetch all history for all tags and branches
+      - name: Install required packages
+        run: |
+          apt-get update
+          apt-get install -y curl jq
+      - name: Checkout codes
+        uses: actions/checkout@v2
 
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: '1.18' # Specify the Go version
+          go-version: '1.24.1'
 
-      - name: Build increment_tag script for release
-        if: contains(github.ref, 'release')
-        run: go build -o increment_tag rc.go commonTagHeaderName.go
-
-      - name: Build increment_tag script for main
-        if: ${{ !contains(github.ref, 'release') }}
-        run: go build -o increment_tag dev.go commonTagHeaderName.go
-
-      - name: Run increment_tag script
-        id: increment_tag
+      - name: Build dev binary
         run: |
-          ./increment_tag
+          go build -o ./cicd/dev_logic_binary ./cicd
+          chmod +x ./cicd/dev_logic_binary
 
-      - name: Configure Git
-        run: |
-          git config --global user.email "Shivam.Bisht@netapp.com"
-          git config --global user.name "netappshivam"
+      - name: Run dev logic
+        run: ./cicd/dev_logic_binary dev
 
-      - name: Create and push new tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+  release_branch:
+    runs-on: [ ubuntu-22.04 ]
+    container:
+      image: ghcr.io/vcp-vsa-control-plane/vsactl:v1
+      options: -v /var/run/docker.sock:/var/run/docker.sock --user root
+
+    steps:
+      - name: Install required packages
         run: |
-          NEW_TAG=${{ steps.increment_tag.outputs.new_tag }}
-          git tag $NEW_TAG
-          git push origin $NEW_TAG
+          apt-get update
+          apt-get install -y curl jq
+      - name: Checkout codes
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.24.1'
+
+      - name: Build release binary
+        run: |
+          go build -o ./cicd/release_logic_binary ./cicd
+          chmod +x ./cicd/release_logic_binary
+
+      - name: Run release logic
+        run: ./cicd/release_logic_binary release
