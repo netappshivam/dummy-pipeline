@@ -11,6 +11,9 @@ jobs:
   dev_increment:
     permissions:
       contents: write
+      actions: read
+      packages: write
+
     runs-on: ubuntu-latest
     steps:
 
@@ -49,6 +52,8 @@ jobs:
   release_branch:
     permissions:
       contents: write
+      actions: read
+      packages: write
 
     runs-on: ubuntu-latest
 
