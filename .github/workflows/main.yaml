@@ -67,6 +67,11 @@ jobs:
         with:
           go-version: '1.24.1'
 
+      - name: Configure Git
+        run: |
+          git config --global user.email "Shivam.Bisht@netapp.com"
+          git config --global user.name "netappshivam"
+
       - name: Build release binary
         run: |
           go build -o ./cicd/release_logic_binary ./cicd
@@ -75,11 +80,6 @@ jobs:
       - name: Run release logic
         id: release_logic_binary
         run: ./cicd/release_logic_binary release
-
-      - name: Configure Git
-        run: |
-            git config --global user.email "Shivam.Bisht@netapp.com"
-            git config --global user.name "netappshivam"
 
       - name: Set Tag
         run: |
