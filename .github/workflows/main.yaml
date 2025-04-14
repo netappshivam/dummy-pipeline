@@ -13,16 +13,9 @@ concurrency:
 jobs:
 
   dev_increment:
-    runs-on: [ ubuntu-22.04 ]
-    container:
-      image: ghcr.io/vcp-vsa-control-plane/vsactl:v1
-      options: -v /var/run/docker.sock:/var/run/docker.sock --user root
-
+    runs-on: ubuntu-latest
     steps:
-      - name: Install required packages
-        run: |
-          apt-get update
-          apt-get install -y curl jq
+
       - name: Checkout codes
         uses: actions/checkout@v2
 
@@ -40,16 +33,9 @@ jobs:
         run: ./cicd/dev_logic_binary dev
 
   release_branch:
-    runs-on: [ ubuntu-22.04 ]
-    container:
-      image: ghcr.io/vcp-vsa-control-plane/vsactl:v1
-      options: -v /var/run/docker.sock:/var/run/docker.sock --user root
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Install required packages
-        run: |
-          apt-get update
-          apt-get install -y curl jq
       - name: Checkout codes
         uses: actions/checkout@v2
 
