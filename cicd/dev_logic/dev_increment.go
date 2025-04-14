@@ -11,6 +11,9 @@ func Dev_increment_logic() {
 	fmt.Printf("Latest and greatest tag is: %s\n", lastTag)
 
 	newTag, _ := release_branch_logic.IncrementTag(lastTag)
+	if len(newTag) == 0 {
+		newTag = "2520.0.0-DEV.1"
+	}
 	fmt.Printf("New tag is: %s\n", newTag)
 
 }
