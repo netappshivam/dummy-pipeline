@@ -6,7 +6,7 @@ import (
 )
 
 func Release_creation() {
-	sprint := setupConfig.CurrentWeekRelease
+	sprint := SetupConfigobject.CurrentWeekRelease
 	fmt.Printf("Checking if branch exists for release-->", sprint)
 
 	// finding if a branch exists for a weekly release

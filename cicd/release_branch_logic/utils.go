@@ -15,7 +15,7 @@ type SetupConfig struct {
 	NextWeekRelease    string `yaml:"next_weekly_release"`
 }
 
-var setupConfig SetupConfig
+var SetupConfigobject SetupConfig
 
 func init() {
 
@@ -52,11 +52,6 @@ func fetchTags() error {
 	}
 	return nil
 }
-
-//
-//func SetNewTag(newTag string) {
-//
-//}
 
 func GitCheckout(branch, ref string) error {
 	cmd := exec.Command("git", "checkout", "-b", branch, ref)
@@ -124,7 +119,7 @@ func loadYaml(filepath string) error {
 		return fmt.Errorf("error reading .yaml file: %v", err)
 	}
 
-	err = yaml.Unmarshal(data, &setupConfig)
+	err = yaml.Unmarshal(data, &SetupConfigobject)
 	if err != nil {
 		return fmt.Errorf("error unmarshalling .yaml file: %v", err)
 	}
