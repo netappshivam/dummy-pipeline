@@ -44,6 +44,7 @@ func LatestTagFetch(typeOfTag string) string {
 		fmt.Println("No tags found matching the pattern:", tagPattern)
 		if typeOfTag == "DEV" {
 			latestTag = currentTagHeader + ".0.0-DEV.1"
+			return latestTag
 		}
 
 	}
