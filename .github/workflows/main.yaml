@@ -33,15 +33,15 @@ jobs:
         run: ./cicd/dev_logic_binary dev
 
       - name: Configure Git
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
             git config --global user.email "Shivam.Bisht@netapp.com"
             git config --global user.name "netappshivam"
 
       - name: Set Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          NEW_TAG=${{ steps.increment_tag.outputs.new_tag }}
+          NEW_TAG=${{ steps.increment_tag.outputs.newTag }}
           git tag $TAG_NAME
           git push origin $TAG_NAME
 
@@ -79,6 +79,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          NEW_TAG=${{ steps.increment_tag.outputs.new_tag }}
+          NEW_TAG=${{ steps.increment_tag.outputs.newTag }}
           git tag $TAG_NAME
           git push origin $TAG_NAME
