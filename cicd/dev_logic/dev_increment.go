@@ -1,8 +1,8 @@
 package dev_logic
 
 import (
+	"dummy-pipeline/cicd/release_branch_logic"
 	"fmt"
-	"cicd/release_branch_logic"
 )
 
 func Dev_increment_logic() {
