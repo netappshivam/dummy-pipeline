@@ -14,6 +14,6 @@ func Dev_increment_logic() {
 	if len(newTag) == 0 {
 		newTag = "2520.0.0-DEV.1"
 	}
-	fmt.Printf("New tag is: %s\n", newTag)
+	fmt.Printf("::set-output name=new_tag::%s\n", newTag)
 
 }
