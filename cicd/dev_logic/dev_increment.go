@@ -13,6 +13,4 @@ func Dev_increment_logic() {
 	newTag, _ := release_branch_logic.IncrementTag(lastTag)
 	fmt.Printf("New tag is: %s\n", newTag)
 
-	release_branch_logic.SetNewTag(newTag)
-
 }
