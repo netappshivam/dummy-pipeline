@@ -7,7 +7,6 @@ on:
   pull_request:
 
 jobs:
-
   dev_increment:
     permissions:
       contents: write
@@ -46,8 +45,8 @@ jobs:
         run: |
           NEW_TAG=${{ steps.abcd.outputs.newTag1 }}
           echo "New tag: $NEW_TAG"
-          git tag $TAG_NAME
-          git push origin $TAG_NAME
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
 
   release_branch:
     permissions:
