@@ -3,9 +3,16 @@ package dev_logic
 import (
 	"dummy-pipeline/cicd/release_branch_logic"
 	"fmt"
+	"os"
 )
 
 func Dev_increment_logic() {
+
+	err := release_branch_logic.FetchTags()
+	if err != nil {
+		fmt.Println("Error fetching tags:", err)
+		os.Exit(1)
+	}
 
 	lastTag := release_branch_logic.LatestTagFetch("Dev")
 	fmt.Printf("Latest and greatest tag is: %s\n", lastTag)

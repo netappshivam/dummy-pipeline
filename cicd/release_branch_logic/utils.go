@@ -44,7 +44,7 @@ func IncrementTag(tag string) (string, error) {
 	return strings.Join(parts, "."), nil
 }
 
-func fetchTags() error {
+func FetchTags() error {
 	cmd := exec.Command("git", "fetch", "--tags")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
