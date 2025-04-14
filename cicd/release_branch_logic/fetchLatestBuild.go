@@ -37,15 +37,19 @@ func LatestTagFetch(typeOfTag string) string {
 
 	// Split the output into individual tags
 	tags := strings.Split(strings.TrimSpace(string(output)), "\n")
+	latestTag := tags[0]
 
 	// Check if any tags were found
 	if len(tags) == 0 || tags[0] == "" {
 		fmt.Println("No tags found matching the pattern:", tagPattern)
-		os.Exit(0)
+		if typeOfTag == "DEV" {
+			latestTag = currentTagHeader + ".0.0-DEV.1"
+		}
+
 	}
 
 	// The first tag in the sorted output is the latest
-	latestTag := tags[0]
+
 	fmt.Println("Latest tag:", latestTag)
 
 	return latestTag
