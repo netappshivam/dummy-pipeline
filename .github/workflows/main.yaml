@@ -46,6 +46,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           NEW_TAG=${{ steps.increment_tag.outputs.newTag }}
+          echo "New tag: $NEW_TAG"
           git tag $TAG_NAME
           git push origin $TAG_NAME
 
