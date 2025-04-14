@@ -14,7 +14,7 @@ func Dev_increment_logic() {
 		os.Exit(1)
 	}
 
-	lastTag := release_branch_logic.LatestTagFetch("Dev")
+	lastTag := release_branch_logic.LatestTagFetch("DEV")
 	fmt.Printf("Latest and greatest tag is: %s\n", lastTag)
 
 	newTag, _ := release_branch_logic.IncrementTag(lastTag)
