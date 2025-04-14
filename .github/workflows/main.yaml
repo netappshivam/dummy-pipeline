@@ -87,6 +87,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          NEW_TAG=${{ steps.release_logic_binary.outputs.new_tag }}
+          NEW_TAG=${{ steps.release_logic_binary.outputs.newTag }}
           git tag $TAG_NAME
           git push origin $TAG_NAME
