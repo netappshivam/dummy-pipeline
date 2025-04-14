@@ -22,7 +22,15 @@ func Release_creation() {
 
 		newTag, _ := IncrementTag(lastTag)
 
-		GitOnlyCheckout("release." + sprint)
+		err := CleanWorkingDirectory()
+		if err != nil {
+			log.Fatalf("Error cleaning working directory: %v", err)
+		}
+
+		err2 := GitOnlyCheckout("release." + sprint)
+		if err2 != nil {
+			log.Fatalf("Error checking out release branch: %v", err2)
+		}
 
 		SetNewTag(newTag)
 
@@ -43,6 +51,7 @@ func Release_creation() {
 		if err := GitPush(latestSprintTag); err != nil {
 			log.Fatalf("Error pushing main: %v", err)
 		}
-		SetNewTag(sprint + ".0.0-RC.1")
+		newTag := sprint + ".0.0-RC.1"
+		fmt.Printf("::set-output name=new_tag::%s\n", newTag)
 	}
 }

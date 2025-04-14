@@ -53,9 +53,10 @@ func fetchTags() error {
 	return nil
 }
 
-func SetNewTag(newTag string) {
-	fmt.Printf("::set-output name=new_tag::%s\n", newTag)
-}
+//
+//func SetNewTag(newTag string) {
+//
+//}
 
 func GitCheckout(branch, ref string) error {
 	cmd := exec.Command("git", "checkout", "-b", branch, ref)

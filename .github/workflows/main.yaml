@@ -32,6 +32,19 @@ jobs:
       - name: Run dev logic
         run: ./cicd/dev_logic_binary dev
 
+      - name: Configure Git
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+            git config --global user.email "Shivam.Bisht@netapp.com"
+            git config --global user.name "netappshivam"
+
+      - name: Set Tag
+        run: |
+          NEW_TAG=${{ steps.increment_tag.outputs.new_tag }}
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
+
   release_branch:
     permissions:
       contents: write
@@ -56,3 +69,16 @@ jobs:
 
       - name: Run release logic
         run: ./cicd/release_logic_binary release
+
+      - name: Configure Git
+        run: |
+            git config --global user.email "Shivam.Bisht@netapp.com"
+            git config --global user.name "netappshivam"
+
+      - name: Set Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          NEW_TAG=${{ steps.increment_tag.outputs.new_tag }}
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
