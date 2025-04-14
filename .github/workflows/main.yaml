@@ -21,6 +21,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -33,7 +34,7 @@ jobs:
           chmod +x ./cicd/dev_logic_binary
 
       - name: Run dev logic
-        id: dev_logic_binary
+        id: abcd
         run: ./cicd/dev_logic_binary dev
 
       - name: Configure Git
@@ -45,7 +46,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          NEW_TAG=${{ steps.dev_logic_binary.outputs.newTag }}
+          NEW_TAG=${{ steps.abcd.outputs.newTag1 }}
           echo "New tag: $NEW_TAG"
           git tag $TAG_NAME
           git push origin $TAG_NAME
@@ -87,6 +88,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          NEW_TAG=${{ steps.release_logic_binary.outputs.newTag }}
+          NEW_TAG=${{ steps.release_logic_binary.outputs.newTag1 }}
           git tag $TAG_NAME
           git push origin $TAG_NAME

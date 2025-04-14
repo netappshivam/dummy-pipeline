@@ -16,6 +16,5 @@ func Dev_increment_logic() {
 		newTag = fmt.Sprintf("2520.0.0-DEV.1")
 	}
 
-	fmt.Printf("::set-output name=newTag::%s\n", newTag)
-
+	fmt.Printf("::set-output name=newTag1::%s\n", newTag)
 }
