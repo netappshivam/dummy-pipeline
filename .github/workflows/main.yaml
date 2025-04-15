@@ -1,56 +1,83 @@
-name: Go Tag Increment
-
+name: Main Workflow
 on:
   push:
     branches:
-      - master
       - main
-      - Go-git
-      - release
-      - Go-Tag2
+      - release.*
+  pull_request:
 
 jobs:
-  tag-increment:
-    runs-on: ubuntu-latest
-
+  dev_increment:
     permissions:
-      contents: write  # Allow read and write access to the repository contents
+      contents: write
       actions: read
-      packages: write  # Add this line to allow pushing tags
+      packages: write
 
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+
+      - name: Checkout codes
+        uses: actions/checkout@v2
         with:
-          fetch-depth: 0  # Fetch all history for all tags and branches
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: '1.18' # Specify the Go version
-
-      - name: Build increment_tag script for release
-        if: contains(github.ref, 'release')
-        run: go build -o increment_tag rc.go commonTagHeaderName.go
-
-      - name: Build increment_tag script for main
-        if: ${{ !contains(github.ref, 'release') }}
-        run: go build -o increment_tag dev.go commonTagHeaderName.go
-
-      - name: Run increment_tag script
-        id: increment_tag
-        run: |
-          ./increment_tag
+          go-version: '1.24.1'
 
       - name: Configure Git
         run: |
           git config --global user.email "Shivam.Bisht@netapp.com"
           git config --global user.name "netappshivam"
 
-      - name: Create and push new tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+      - name: Run dev logic
+        id: abcd
+        run: go run main.go tag devCmd
+
+      - name: Set Tag
         run: |
-          NEW_TAG=${{ steps.increment_tag.outputs.new_tag }}
+          NEW_TAG=${{ steps.abcd.outputs.newTag1 }}
+          echo "New tag: $NEW_TAG"
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
+
+  release_branch:
+    permissions:
+      contents: write
+      actions: read
+      packages: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout codes
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.24.1'
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "Shivam.Bisht@netapp.com"
+          git config --global user.name "netappshivam"
+
+#      - name: Build release binary
+#        run: |
+#          go build -o ./cicd/release_logic_binary ./cicd
+#          chmod +x ./cicd/release_logic_binary
+
+      - name: Run release logic
+        id: release_logic_binary
+        run: go run main.go tag releaseCmd
+
+      - name: Set Tag
+        run: |
+          NEW_TAG=${{ steps.release_logic_binary.outputs.new_tag }}
           git tag $NEW_TAG
           git push origin $NEW_TAG
