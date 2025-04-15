@@ -34,7 +34,7 @@ jobs:
 
       - name: Run dev logic
         id: abcd
-        run: go run main.go tag devCmd
+        run: go run main.go tag dev_increment
 
       - name: Set Tag
         run: |
@@ -74,7 +74,7 @@ jobs:
 
       - name: Run release logic
         id: release_logic_binary
-        run: go run main.go tag releaseCmd
+        run: go run main.go tag release
 
       - name: Set Tag
         run: |
