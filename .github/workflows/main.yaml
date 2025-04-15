@@ -38,7 +38,7 @@ jobs:
 
       - name: Run dev logic
         id: dev_logic
-        run: vsactl tag dev_increment
+        run: go run main.go tag dev_increment
 
       - name: Set Tag
         run: |
@@ -72,14 +72,9 @@ jobs:
           git config --global user.email "Shivam.Bisht@netapp.com"
           git config --global user.name "netappshivam"
 
-#      - name: Build release binary
-#        run: |
-#          go build -o ./cicd/release_logic_binary ./cicd
-#          chmod +x ./cicd/release_logic_binary
-
       - name: Run release logic
         id: release_logic_binary
-        run: vsactl tag release
+        run: go run main.go tag release
 
       - name: Set Tag
         run: |
