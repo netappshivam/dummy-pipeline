@@ -8,6 +8,36 @@ on:
   pull_request:
 
 jobs:
+
+
+  build_cicd:
+    runs-on: [ self-hosted,linux ]
+    container:
+      image: ghcr.io/vcp-vsa-control-plane/vsa-builder:v1
+      options: --user root
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: go.mod
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKER_USERNAME }}  # TODO: use Github bot account here
+          password: ${{ secrets.DOCKER_PASSWORD }}  # TODO: use Github bot account here
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKER_USERNAME }}  # TODO: use Github bot account here
+          password: ${{ secrets.DOCKER_PASSWORD }}   # TODO: use Github bot account here
+
   dev_increment:
     permissions:
       contents: write
