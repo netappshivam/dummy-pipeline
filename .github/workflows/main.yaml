@@ -10,7 +10,7 @@ on:
 jobs:
 
   dev_increment:
-    if: "!startsWith(github.ref, 'refs/heads/release')"
+    if: "!startsWith(github.ref, 'refs/heads/release.*')"
     permissions:
       contents: write
       actions: read
@@ -48,7 +48,7 @@ jobs:
           git push origin $NEW_TAG
 
   release_branch:
-    if: "startsWith(github.ref, 'refs/heads/release')"
+    if: "startsWith(github.ref, 'refs/heads/release.*')"
     permissions:
       contents: write
       actions: read
