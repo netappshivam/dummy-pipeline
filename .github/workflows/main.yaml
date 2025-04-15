@@ -15,10 +15,9 @@ jobs:
       packages: write
 
     runs-on: ubuntu-latest
-    with:
-      container:
-        image: ghcr.io/greenqloud/cvi/sbisht/testdummy:v1
-        options: -v /var/run/docker.sock:/var/run/docker.sock --user root
+    container:
+      image: ghcr.io/greenqloud/cvi/sbisht/testdummy:v1
+      options: -v /var/run/docker.sock:/var/run/docker.sock --user root
     steps:
 
       - name: Checkout codes
@@ -55,10 +54,9 @@ jobs:
       packages: write
 
     runs-on: ubuntu-latest
-    with:
-      container:
-        image: ghcr.io/greenqloud/cvi/sbisht/testdummy:v1
-        options: -v /var/run/docker.sock:/var/run/docker.sock --user root
+    container:
+      image: ghcr.io/greenqloud/cvi/sbisht/testdummy:v1
+      options: -v /var/run/docker.sock:/var/run/docker.sock --user root
 
     steps:
       - name: Checkout codes
