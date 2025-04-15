@@ -39,6 +39,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}   # TODO: use Github bot account here
 
   dev_increment:
+    if: !startsWith(github.ref, 'refs/heads/release')
     needs: [build_cicd]
     permissions:
       contents: write
@@ -79,6 +80,7 @@ jobs:
           git push origin $NEW_TAG
 
   release_branch:
+    if: startsWith(github.ref, 'refs/heads/release')
     needs: [build_cicd]
     permissions:
       contents: write
