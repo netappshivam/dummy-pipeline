@@ -13,7 +13,7 @@ jobs:
   build_cicd:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/vcp-vsa-control-plane/vsa-builder:v1
+      image: ghcr.io/greenqloud/cvi/sbisht/testdummy:v1
       options: --user root
     steps:
       - name: Check out the repo
