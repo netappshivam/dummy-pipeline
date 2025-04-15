@@ -12,9 +12,7 @@ jobs:
 
   build_cicd:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/greenqloud/cvi/sbisht/testdummy:v1
-      options: -v /var/run/docker.sock:/var/run/docker.sock --user root
+
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -47,9 +45,7 @@ jobs:
       packages: write
 
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/greenqloud/cvi/sbisht/testdummy:v1
-      options: -v /var/run/docker.sock:/var/run/docker.sock --user root
+
     steps:
 
       - name: Checkout codes
@@ -88,9 +84,6 @@ jobs:
       packages: write
 
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/greenqloud/cvi/sbisht/testdummy:v1
-      options: -v /var/run/docker.sock:/var/run/docker.sock --user root
 
     steps:
       - name: Checkout codes
