@@ -11,7 +11,7 @@ jobs:
 
 
   build_cicd:
-    runs-on: [ self-hosted,linux ]
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/vcp-vsa-control-plane/vsa-builder:v1
       options: --user root
