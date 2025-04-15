@@ -31,7 +31,7 @@ func Dev_increment_logic() {
 		newTag = SetupConfigobject.CurrentWeekRelease + ".0.0-DEV.1"
 	}
 
-	fmt.Printf("::set-output name=newTag1::%s\n", newTag)
+	fmt.Printf("::set-output name=new_tag::%s\n", newTag)
 }
 
 func init() {
