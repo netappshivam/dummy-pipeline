@@ -1,15 +1,9 @@
-name: Main Workflow
+name: Release Workflow
 on:
-  push:
-    branches:
-      - main
-      - release.gcp.**
-  pull_request:
+  workflow_dispatch:
 
 jobs:
-
-  dev_increment:
-    if: "!startsWith(github.ref, 'refs/heads/release') && github.event_name == 'push' && github.ref == 'refs/heads/main'"
+  release_branch:
     permissions:
       contents: write
       actions: read
@@ -18,12 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout codes
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.GH_PAT }}
-          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -44,13 +36,13 @@ jobs:
           git config --global user.email "$EMAIL"
           git config --global user.name "$USERNAME"
 
-      - name: Run dev logic
-        id: dev_logic
-        run: go run main.go tag dev_increment
+      - name: Run release logic
+        id: release_logic_binary
+        run: go run main.go tag release
 
       - name: Set Tag
         run: |
-          NEW_TAG=${{ steps.dev_logic.outputs.new_tag }}
-          echo "New tag: $NEW_TAG"
+          NEW_TAG=${{ steps.release_logic_binary.outputs.new_tag }}
           git tag $NEW_TAG
           git push origin $NEW_TAG
+
