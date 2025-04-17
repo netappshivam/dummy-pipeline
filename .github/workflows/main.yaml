@@ -10,6 +10,7 @@ on:
 jobs:
 
   dev_increment:
+    if: "!startsWith(github.ref, 'refs/heads/release') && github.event_name == 'push' && github.ref == 'refs/heads/main'"
     permissions:
       contents: write
       actions: read
@@ -47,6 +48,7 @@ jobs:
           git push origin $NEW_TAG
 
   release_branch:
+    if: "startsWith(github.ref, 'refs/heads/release') && github.event_name == 'push' && github.ref == 'refs/heads/release.**'"
     permissions:
       contents: write
       actions: read
@@ -67,8 +69,17 @@ jobs:
 
       - name: Configure Git
         run: |
-          git config --global user.email "Shivam.Bisht@netapp.com"
-          git config --global user.name "netappshivam"
+          USERNAME=${{ github.actor }}
+          echo "Fetching email for $USERNAME"
+          EMAIL=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" https://api.github.com/users/$USERNAME | jq -r '.email')
+          if [ "$EMAIL" == "null" ]; then
+            EMAIL="$USERNAME@users.noreply.github.com"
+          fi
+          echo "Using email: $EMAIL"
+          echo "Using username: $USERNAME"
+          
+          git config --global user.email "$EMAIL"
+          git config --global user.name "$USERNAME"
 
       - name: Run release logic
         id: release_logic_binary
