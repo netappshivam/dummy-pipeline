@@ -4,50 +4,55 @@ on:
     branches:
       - main
       - release.*
+      - cobra
   pull_request:
 
 jobs:
 
   dev_increment:
+    if: "!startsWith(github.ref, 'refs/heads/release') && github.event_name == 'push' && github.ref == 'refs/heads/main'"
     permissions:
       contents: write
+      actions: read
+      packages: write
+
     runs-on: ubuntu-latest
+
     steps:
 
       - name: Checkout codes
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
           go-version: '1.24.1'
 
-      - name: Build dev binary
+      - name: Configure Git
         run: |
-          go build -o ./cicd/dev_logic_binary ./cicd
-          chmod +x ./cicd/dev_logic_binary
+          git config --global user.email "Shivam.Bisht@netapp.com"
+          git config --global user.name "netappshivam"
 
       - name: Run dev logic
-        run: ./cicd/dev_logic_binary dev
-
-      - name: Configure Git
-        run: |
-            git config --global user.email "Shivam.Bisht@netapp.com"
-            git config --global user.name "netappshivam"
+        id: dev_logic
+        run: go run main.go tag dev_increment
 
       - name: Set Tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          NEW_TAG=${{ steps.increment_tag.outputs.newTag }}
-          git tag $TAG_NAME
-          git push origin $TAG_NAME
+          NEW_TAG=${{ steps.dev_logic.outputs.new_tag }}
+          echo "New tag: $NEW_TAG"
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
 
   release_branch:
+    if: "startsWith(github.ref, 'refs/heads/release') && github.event_name == 'push' && github.ref == 'refs/heads/release.**'"
     permissions:
       contents: write
+      actions: read
+      packages: write
 
     runs-on: ubuntu-latest
 
@@ -62,23 +67,27 @@ jobs:
         with:
           go-version: '1.24.1'
 
-      - name: Build release binary
-        run: |
-          go build -o ./cicd/release_logic_binary ./cicd
-          chmod +x ./cicd/release_logic_binary
-
-      - name: Run release logic
-        run: ./cicd/release_logic_binary release
-
       - name: Configure Git
         run: |
-            git config --global user.email "Shivam.Bisht@netapp.com"
-            git config --global user.name "netappshivam"
+          USERNAME=${{ github.actor }}
+          echo "Fetching email for $USERNAME"
+          EMAIL=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" https://api.github.com/users/$USERNAME | jq -r '.email')
+          if [ "$EMAIL" == "null" ]; then
+            EMAIL="$USERNAME@users.noreply.github.com"
+          fi
+          echo "Using email: $EMAIL"
+          echo "Using username: $USERNAME"
+          
+          git config --global user.email "$EMAIL"
+          git config --global user.name "$USERNAME"
+
+      - name: Run release logic
+        id: release_logic_binary
+        run: go run main.go tag release
 
       - name: Set Tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          NEW_TAG=${{ steps.increment_tag.outputs.newTag }}
-          git tag $TAG_NAME
-          git push origin $TAG_NAME
+          NEW_TAG=${{ steps.release_logic_binary.outputs.new_tag }}
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
+          

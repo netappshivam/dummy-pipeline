@@ -1,32 +1,33 @@
-# Use the official Golang image as the builder
-FROM golang:1.18-buster AS builder
+FROM ghcr.io/vcp-vsa-control-plane/vsa-builder:v2
 
-# Set the working directory
-WORKDIR /app
+#ARG RUNNER=github
+#ARG GO_VERSION
+#ARG GO_FILENAME
+#ARG GO_FILENAME_SHA
 
-# Copy the go.mod and go.sum files
-COPY go.mod go.sum ./
+ARG RUNNER=github
+ARG GO_VERSION
+ARG GO_FILENAME
+ARG GO_FILENAME_SHA
 
-# Download dependencies
-RUN go mod download
+USER root
 
-# Copy the rest of the application code
-COPY . .
+SHELL [ "/bin/bash", "-e", "-o", "pipefail", "-c" ]
 
-# Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o rc .
+ENV PATH=$PATH:/usr/local/go/bin
+ENV GOBIN=/usr/local/go/bin
 
-# Use a minimal image for the final stage
-FROM alpine:latest
+RUN mkdir -p /usr/local/go && chown github:github /usr/local/go
 
-# Set the working directory
-WORKDIR /root/
+USER github
 
-# Copy the built application from the builder stage
-COPY --from=builder /app/main .
-COPY --from=builder /app/rc .
+RUN cd /tmp && curl -y 20 -Y 1000 --retry 5 --retry-max-time 30 --connect-timeout 30 --no-progress-meter -SLO https://go.dev/dl/${GO_FILENAME} ; \
+  echo "${GO_FILENAME_SHA} ${GO_FILENAME}" | sha256sum -c - || exit 1 ; \
+  cd /usr/local && \
+  tar zxf /tmp/${GO_FILENAME} && \
+  rm -rf /tmp/* && \
+  /usr/local/go/bin/go version > ~/go-version
 
-# Command to run the application
-CMD ["./main"]
-CMD ["./rc"]
+COPY bin/build/linux/vsactl /usr/local/bin/
+
+USER github
