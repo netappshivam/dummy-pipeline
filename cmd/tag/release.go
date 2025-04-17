@@ -33,7 +33,7 @@ func Release_creation() {
 			log.Fatalf("Error cleaning working directory: %v", err)
 		}
 
-		err2 := GitOnlyCheckout("release." + sprint)
+		err2 := GitOnlyCheckout("release.gcp." + sprint)
 		if err2 != nil {
 			log.Fatalf("Error checking out release branch: %v", err2)
 		}
@@ -52,7 +52,7 @@ func Release_creation() {
 			log.Fatalf("Error cleaning working directory: %v", err)
 		}
 
-		latestSprintTag := "release." + sprint
+		latestSprintTag := "release.gcp." + sprint
 
 		fmt.Printf("Since there is no tag created for the sprint - %s, cutting the release main based out of master main\n", sprint)
 		fmt.Printf("Creating the main - %s\n", sprint)

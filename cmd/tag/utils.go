@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 	"strconv"
@@ -85,7 +84,7 @@ func GitPush(branch string) error {
 }
 
 func FetchReleaseBranch(sprint string) (string, error) {
-	cmd := exec.Command("git", "branch", "-r", "--list", "origin/release."+sprint)
+	cmd := exec.Command("git", "branch", "-r", "--list", "origin/release.gcp."+sprint)
 	output, err := cmd.Output()
 	if err != nil {
 		return "", err
@@ -134,18 +133,4 @@ func loadYaml(filepath string) error {
 		return fmt.Errorf("error unmarshalling .yaml file: %v", err)
 	}
 	return nil
-}
-func GithubUserEmail() {
-	user, err := github.GetGithubUser(github.GhToken, github.PrUser)
-	if err != nil {
-		log.Println("Error:", err)
-		os.Exit(1)
-	}
-
-	if user.Email == nil {
-		log.Println("Error: Email not available for user:", github.PrUser)
-		os.Exit(1)
-	}
-
-	ghEmail := *user.Email
 }
