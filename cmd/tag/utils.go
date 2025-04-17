@@ -54,7 +54,7 @@ func FetchTags() error {
 }
 
 func FetchTagsPrune() error {
-	cmd := exec.Command("git", "fetch", "--prune")
+	cmd := exec.Command("git", "fetch", "--prune", "--tags")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("failed to fetch tags: %s, output: %s", err, string(output))

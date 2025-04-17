@@ -28,7 +28,7 @@ func LatestTagFetch(typeOfTag string) string {
 	currentTagHeader := SetupConfigobject.CurrentWeekRelease
 
 	// Fetch the latest tags from the remote repository
-	err := FetchTags()
+	err := FetchTagsPrune()
 	if err != nil {
 		fmt.Println("Error fetching tags:", err)
 		os.Exit(1)

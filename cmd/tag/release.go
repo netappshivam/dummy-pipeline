@@ -21,7 +21,6 @@ func Release_creation() {
 
 	// finding if a branch exists for a weekly release
 	FetchTagsPrune()
-	FetchTags()
 	last_branch, err := FetchReleaseBranch(sprint)
 	if err != nil {
 		log.Fatalf("Error fetching release branch: %v", err)

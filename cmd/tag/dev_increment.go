@@ -17,7 +17,7 @@ var devIncrementCmd = &cobra.Command{
 
 func Dev_increment_logic() {
 
-	err := FetchTags()
+	err := FetchTagsPrune()
 	if err != nil {
 		fmt.Println("Error fetching tags:", err)
 		os.Exit(1)
