@@ -53,7 +53,7 @@ func GitOnlyCheckout(branch string) error {
 
 func GitPush(branch string) error {
 	cmd := exec.Command("git", "push", "origin", branch)
-	log.Printf("Running 'git push %s'", cmd)
+	log.Printf("Running %s'", cmd)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()

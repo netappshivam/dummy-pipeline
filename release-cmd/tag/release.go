@@ -88,7 +88,6 @@ func PromotionalCreation() {
 		log.Fatalf("Error pushing git tag: %v", errGitPush)
 	}
 
-	fmt.Printf("::set-output name=newTag::%s\n", SetupConfigobject.FinalRelease)
 }
 
 func init() {
