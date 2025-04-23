@@ -1,7 +1,7 @@
 package main
 
-import "dummy-pipeline/cmd"
+import "dummy-pipeline/release-cmd"
 
 func main() {
-	cmd.Execute()
+	release_cmd.Execute()
 }

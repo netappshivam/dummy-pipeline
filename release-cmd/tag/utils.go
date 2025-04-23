@@ -4,53 +4,27 @@ import (
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"io"
+	"log"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 )
 
 type SetupConfig struct {
-	CurrentWeekRelease string `yaml:"current_weekly_release"`
-	NextWeekRelease    string `yaml:"next_weekly_release"`
+	BaseRelease  string `yaml:"base_tag"`   //"2512.0.0-DEV.0"
+	FinalRelease string `yaml:"target_tag"` //"2512.0.0"
 }
 
 var SetupConfigobject SetupConfig
 
 func init() {
 
-	loadYaml("./cmd/releases.yaml")
-}
-
-func IncrementTag(tag string) (string, error) {
-	// Split the tag into parts by "."
-	parts := strings.Split(tag, ".")
-	if len(parts) != 4 {
-		return "", fmt.Errorf("invalid tag format: %s", tag)
+	err_load := loadYaml("./release-cmd/releases.yaml")
+	if err_load != nil {
+		log.Fatal(err_load)
+		return
 	}
 
-	// Parse the last part as an integer
-	lastPart := parts[3]
-	lastNum, err := strconv.Atoi(lastPart)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse last part of tag as number: %s", lastPart)
-	}
-
-	// Increment the last number
-	lastNum++
-
-	// Reconstruct the tag with the incremented number
-	parts[3] = strconv.Itoa(lastNum)
-	return strings.Join(parts, "."), nil
-}
-
-func FetchTags() error {
-	cmd := exec.Command("git", "fetch", "--tags")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("failed to fetch tags: %s, output: %s", err, string(output))
-	}
-	return nil
 }
 
 func FetchTagsPrune() error {
@@ -83,8 +57,8 @@ func GitPush(branch string) error {
 	return cmd.Run()
 }
 
-func FetchReleaseBranch(sprint string) (string, error) {
-	cmd := exec.Command("git", "branch", "-r", "--list", "origin/release.gcp."+sprint)
+func FetchReleaseBranch(BranchName string) (string, error) {
+	cmd := exec.Command("git", "branch", "-r", "--list", "origin/"+BranchName)
 	output, err := cmd.Output()
 	if err != nil {
 		return "", err
@@ -122,7 +96,11 @@ func loadYaml(filepath string) error {
 	if err != nil {
 		return fmt.Errorf("error opening .yaml file: %v", err)
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Printf("Error closing file: %v", err)
+		}
+	}()
 	data, err := io.ReadAll(file)
 	if err != nil {
 		return fmt.Errorf("error reading .yaml file: %v", err)
@@ -132,5 +110,15 @@ func loadYaml(filepath string) error {
 	if err != nil {
 		return fmt.Errorf("error unmarshalling .yaml file: %v", err)
 	}
+	return nil
+}
+
+func CreateGitTag(newTag, existingTag string) error {
+	cmd := exec.Command("git", "tag", newTag, existingTag)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("failed to create git tag: %v, output: %s", err, string(output))
+	}
+	fmt.Printf("Successfully created tag %s from %s\n", newTag, existingTag)
 	return nil
 }

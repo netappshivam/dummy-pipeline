@@ -6,12 +6,11 @@ import (
 
 var TagCmd = &cobra.Command{
 	Use:   "tag",
-	Short: "A conalities",
+	Short: "Entry point for tag related commands",
 }
 
 func init() {
 
 	TagCmd.AddCommand(releaseCmd)
-	TagCmd.AddCommand(devIncrementCmd)
 
 }

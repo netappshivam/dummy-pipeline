@@ -1,14 +1,10 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
-package cmd
+package release_cmd
 
 import (
-	"dummy-pipeline/cmd/tag"
-	"os"
-
+	"dummy-pipeline/release-cmd/tag"
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 var rootCmd = &cobra.Command{
