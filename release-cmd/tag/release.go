@@ -57,10 +57,10 @@ func Release_creation() {
 			log.Fatalf("Error pushing main: %v", err)
 		}
 
-		errGitPush := GitPush(SetupConfigobject.FinalRelease)
-		if errGitPush != nil {
-			log.Fatalf("Error pushing new tag: %v", errGitPush)
-		}
+		//errGitPush := GitPush(SetupConfigobject.FinalRelease)
+		//if errGitPush != nil {
+		//	log.Fatalf("Error pushing new tag: %v", errGitPush)
+		//}
 		fmt.Sprintf("::set-output name=newTag::%s\n", SetupConfigobject.FinalRelease)
 
 	} else {
