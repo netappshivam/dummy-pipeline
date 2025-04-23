@@ -73,6 +73,12 @@ func Release_creation() {
 }
 
 func PromotionalCreation() {
+	err_fetch := FetchTagsPrune()
+	if err_fetch != nil {
+		log.Printf("Failed to fetch tags: %v", err_fetch)
+		return
+	}
+
 	err := CleanWorkingDirectory()
 	if err != nil {
 		log.Fatalf("Error cleaning working directory: %v", err)
