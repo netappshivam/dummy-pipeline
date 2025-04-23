@@ -57,7 +57,7 @@ func Release_creation() {
 			log.Fatalf("Error pushing main: %v", err)
 		}
 
-		errCreateGit := CreateGitTag(SetupConfigobject.FinalRelease, SetupConfigobject.BaseRelease)
+		errCreateGit := CreateGitTag(SetupConfigobject.FinalRelease, "")
 		if errCreateGit != nil {
 			log.Fatalf("Error creating tag: %v", errCreateGit)
 		}
@@ -88,7 +88,7 @@ func PromotionalCreation() {
 		log.Fatalf("Error pushing git tag: %v", errGitPush)
 	}
 
-	fmt.Sprintf("::set-output name=newTag::%s\n", SetupConfigobject.FinalRelease)
+	fmt.Printf("::set-output name=newTag::%s\n", SetupConfigobject.FinalRelease)
 }
 
 func init() {

@@ -116,11 +116,21 @@ func loadYaml(filepath string) error {
 }
 
 func CreateGitTag(newTag, existingTag string) error {
-	cmd := exec.Command("git", "tag", newTag, existingTag)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("failed to create git tag: %v, output: %s", err, string(output))
+	if existingTag == "" {
+		cmd := exec.Command("git", "tag", "-a", newTag, "-m", "Tagging feature branch")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return fmt.Errorf("failed to create git tag: %v, output: %s", err, string(output))
+		}
+		fmt.Printf("Successfully created tag %s\n", newTag)
+		return nil
+	} else {
+		cmd := exec.Command("git", "tag", newTag, existingTag)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return fmt.Errorf("failed to create git tag: %v, output: %s", err, string(output))
+		}
+		fmt.Printf("Successfully created tag %s from %s\n", newTag, existingTag)
+		return nil
 	}
-	fmt.Printf("Successfully created tag %s from %s\n", newTag, existingTag)
-	return nil
 }
