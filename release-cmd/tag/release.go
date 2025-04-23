@@ -49,10 +49,8 @@ func Release_creation() {
 
 		latestSprintTag := "release." + sprint
 
-		FromTag := SetupConfigobject.BaseRelease
-
 		fmt.Printf("Creating the main - %s\n", sprint)
-		if err := GitCheckout(latestSprintTag, FromTag); err != nil {
+		if err := GitCheckout(latestSprintTag, SetupConfigobject.BaseRelease); err != nil {
 			log.Fatalf("Error creating main: %v", err)
 		}
 		if err := GitPush(latestSprintTag); err != nil {
@@ -63,6 +61,7 @@ func Release_creation() {
 		if errGitPush != nil {
 			log.Fatalf("Error pushing new tag: %v", errGitPush)
 		}
+		fmt.Sprintf("::set-output name=newTag::%s\n", SetupConfigobject.FinalRelease)
 
 	} else {
 		log.Printf("Branch exists")
@@ -84,6 +83,8 @@ func PromotionalCreation() {
 	if errGitPush != nil {
 		log.Fatalf("Error pushing git tag: %v", errGitPush)
 	}
+
+	fmt.Sprintf("::set-output name=newTag::%s\n", SetupConfigobject.FinalRelease)
 }
 
 func init() {
