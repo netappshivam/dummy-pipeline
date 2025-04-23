@@ -57,11 +57,15 @@ func Release_creation() {
 			log.Fatalf("Error pushing main: %v", err)
 		}
 
-		//errGitPush := GitPush(SetupConfigobject.FinalRelease)
-		//if errGitPush != nil {
-		//	log.Fatalf("Error pushing new tag: %v", errGitPush)
-		//}
-		fmt.Printf("::set-output name=newTag::%s\n", SetupConfigobject.FinalRelease)
+		errCreateGit := CreateGitTag(SetupConfigobject.FinalRelease, SetupConfigobject.BaseRelease)
+		if errCreateGit != nil {
+			log.Fatalf("Error creating tag: %v", errCreateGit)
+		}
+
+		errGitPush := GitPush(SetupConfigobject.FinalRelease)
+		if errGitPush != nil {
+			log.Fatalf("Error pushing new tag: %v", errGitPush)
+		}
 
 	} else {
 		log.Printf("Branch exists")

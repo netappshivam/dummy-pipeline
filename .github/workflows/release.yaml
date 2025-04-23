@@ -43,8 +43,8 @@ jobs:
         id: release_logic_binary
         run: go run main.go tag release
 
-      - name: Set Tag
-        run: |
-          NEW_TAG=${{ steps.release_logic_binary.outputs.newTag }}
-          git tag $NEW_TAG
-          git push origin $NEW_TAG
+#      - name: Set Tag
+#        run: |
+#          NEW_TAG=${{ steps.release_logic_binary.outputs.newTag }}
+#          git tag $NEW_TAG
+#          git push origin $NEW_TAG
