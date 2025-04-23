@@ -134,3 +134,29 @@ func CreateGitTag(newTag, existingTag string) error {
 		return nil
 	}
 }
+
+func ReleaseGithub() {
+
+	// Construct the command
+	repo := os.Getenv("GITHUB_REPOSITORY")
+	token := os.Getenv("GH_PAT")
+
+	cmdArgs := []string{"release", "create", "-R", fmt.Sprintf("https://github.com/%s", repo), "--generate-notes"}
+	if strings.Contains(SetupConfigobject.BaseRelease, "-DEV.") {
+		cmdArgs = append(cmdArgs, "--prerelease")
+	}
+	cmdArgs = append(cmdArgs, SetupConfigobject.FinalRelease)
+
+	// Execute the command
+	cmd := exec.Command("gh", cmdArgs...)
+	cmd.Env = append(os.Environ(), fmt.Sprintf("GITHUB_TOKEN=%s", token))
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		fmt.Printf("Output: %s\n", string(output))
+		return
+	}
+
+	fmt.Println("Release created successfully!")
+}

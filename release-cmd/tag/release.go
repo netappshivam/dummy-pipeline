@@ -22,6 +22,7 @@ func ReleaseType() {
 	} else if strings.Contains(SetupConfigobject.BaseRelease, "-RC.") {
 		PromotionalCreation()
 	}
+	ReleaseGithub()
 }
 
 func Release_creation() {
