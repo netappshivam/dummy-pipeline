@@ -61,7 +61,7 @@ func Release_creation() {
 		//if errGitPush != nil {
 		//	log.Fatalf("Error pushing new tag: %v", errGitPush)
 		//}
-		fmt.Sprintf("::set-output name=newTag::%s\n", SetupConfigobject.FinalRelease)
+		fmt.Printf("::set-output name=newTag::%s\n", SetupConfigobject.FinalRelease)
 
 	} else {
 		log.Printf("Branch exists")
