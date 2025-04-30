@@ -99,7 +99,7 @@ func PromotionalCreation() {
 	//if errSetEnv != nil {
 	//	log.Fatalf("Error setting environment variable: %v", errSetEnv)
 	//}
-	log.Printf("::set-output name=SAMPLE_TAG::%s\n", SetupConfigobject.FinalRelease)
+	fmt.Printf("::set-output name=SAMPLE_TAG::%s\n", SetupConfigobject.FinalRelease)
 
 }
 
