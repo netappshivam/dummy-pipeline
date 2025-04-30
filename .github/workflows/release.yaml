@@ -41,12 +41,16 @@ jobs:
 
       - name: Run release logic
         id: release_logic_binary
-        run: go run main.go tag release
+        run: |
+          go run main.go tag release
+          echo "FINAL_RELEASE_TAG=${FINAL_RELEASE_TAG}" >> $GITHUB_ENV
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
 
-#      - name: Set Tag
-#        run: |
-#          NEW_TAG=${{ steps.release_logic_binary.outputs.newTag }}
-#          git tag $NEW_TAG
-#          git push origin $NEW_TAG
+      - name: Build and push Docker images
+        run: echo ${{ env.FINAL_RELEASE_TAG }}
+        env:
+          FINAL_RELEASE_TAG: ${{ env.FINAL_RELEASE_TAG }}
+
+
+
