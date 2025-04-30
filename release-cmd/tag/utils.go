@@ -4,53 +4,27 @@ import (
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"io"
+	"log"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 )
 
 type SetupConfig struct {
-	CurrentWeekRelease string `yaml:"current_weekly_release"`
-	NextWeekRelease    string `yaml:"next_weekly_release"`
+	BaseRelease  string `yaml:"base_tag"`   //"2512.0.0-DEV.0"
+	FinalRelease string `yaml:"target_tag"` //"2512.0.0"
 }
 
 var SetupConfigobject SetupConfig
 
 func init() {
 
-	loadYaml("./cmd/releases.yaml")
-}
-
-func IncrementTag(tag string) (string, error) {
-	// Split the tag into parts by "."
-	parts := strings.Split(tag, ".")
-	if len(parts) != 4 {
-		return "", fmt.Errorf("invalid tag format: %s", tag)
+	err_load := loadYaml("./release-cmd/releases.yaml")
+	if err_load != nil {
+		log.Fatal(err_load)
+		return
 	}
 
-	// Parse the last part as an integer
-	lastPart := parts[3]
-	lastNum, err := strconv.Atoi(lastPart)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse last part of tag as number: %s", lastPart)
-	}
-
-	// Increment the last number
-	lastNum++
-
-	// Reconstruct the tag with the incremented number
-	parts[3] = strconv.Itoa(lastNum)
-	return strings.Join(parts, "."), nil
-}
-
-func FetchTags() error {
-	cmd := exec.Command("git", "fetch", "--tags")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("failed to fetch tags: %s, output: %s", err, string(output))
-	}
-	return nil
 }
 
 func FetchTagsPrune() error {
@@ -64,6 +38,7 @@ func FetchTagsPrune() error {
 
 func GitCheckout(branch, ref string) error {
 	cmd := exec.Command("git", "checkout", "-b", branch, ref)
+	log.Printf("Running 'git checkout %s'", cmd)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
@@ -78,13 +53,14 @@ func GitOnlyCheckout(branch string) error {
 
 func GitPush(branch string) error {
 	cmd := exec.Command("git", "push", "origin", branch)
+	log.Printf("Running %s'", cmd)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }
 
-func FetchReleaseBranch(sprint string) (string, error) {
-	cmd := exec.Command("git", "branch", "-r", "--list", "origin/release.gcp."+sprint)
+func FetchReleaseBranch(BranchName string) (string, error) {
+	cmd := exec.Command("git", "branch", "-r", "--list", "origin/"+BranchName)
 	output, err := cmd.Output()
 	if err != nil {
 		return "", err
@@ -122,7 +98,11 @@ func loadYaml(filepath string) error {
 	if err != nil {
 		return fmt.Errorf("error opening .yaml file: %v", err)
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Printf("Error closing file: %v", err)
+		}
+	}()
 	data, err := io.ReadAll(file)
 	if err != nil {
 		return fmt.Errorf("error reading .yaml file: %v", err)
@@ -133,4 +113,50 @@ func loadYaml(filepath string) error {
 		return fmt.Errorf("error unmarshalling .yaml file: %v", err)
 	}
 	return nil
+}
+
+func CreateGitTag(newTag, existingTag string) error {
+	if existingTag == "" {
+		cmd := exec.Command("git", "tag", "-a", newTag, "-m", "Tagging feature branch")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return fmt.Errorf("failed to create git tag: %v, output: %s", err, string(output))
+		}
+		fmt.Printf("Successfully created tag %s\n", newTag)
+		return nil
+	} else {
+		cmd := exec.Command("git", "tag", newTag, existingTag)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return fmt.Errorf("failed to create git tag: %v, output: %s", err, string(output))
+		}
+		fmt.Printf("Successfully created tag %s from %s\n", newTag, existingTag)
+		return nil
+	}
+}
+
+func ReleaseGithub() {
+
+	// Construct the command
+	repo := os.Getenv("GITHUB_REPOSITORY")
+	token := os.Getenv("GH_PAT")
+
+	cmdArgs := []string{"release", "create", "-R", fmt.Sprintf("https://github.com/%s", repo), "--generate-notes"}
+	if strings.Contains(SetupConfigobject.BaseRelease, "-DEV.") {
+		cmdArgs = append(cmdArgs, "--prerelease")
+	}
+	cmdArgs = append(cmdArgs, SetupConfigobject.FinalRelease)
+
+	// Execute the command
+	cmd := exec.Command("gh", cmdArgs...)
+	cmd.Env = append(os.Environ(), fmt.Sprintf("GITHUB_TOKEN=%s", token))
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		fmt.Printf("Output: %s\n", string(output))
+		return
+	}
+
+	fmt.Println("Release created successfully!")
 }
