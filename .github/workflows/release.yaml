@@ -42,7 +42,7 @@ jobs:
       - name: Run release logic
         id: release_logic_binary
         run: |
-          go run main.go tag release
+          FINAL_RELEASE_TAG=$(go run main.go tag release)
           echo "DEBUG: FINAL_RELEASE_TAG=${FINAL_RELEASE_TAG}"
           echo "FINAL_RELEASE_TAG=${FINAL_RELEASE_TAG}" >> $GITHUB_ENV
         env:
