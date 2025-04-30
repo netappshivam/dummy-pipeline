@@ -1,6 +1,6 @@
 name: Release Workflow
 on:
-  push:
+  pull_request:
     paths:
       - dummy-pipeline/release-cmd/releases.yaml
 
