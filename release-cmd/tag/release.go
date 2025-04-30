@@ -96,9 +96,12 @@ func PromotionalCreation() {
 		log.Fatalf("Error pushing git tag: %v", errGitPush)
 	}
 
-	errSetEnv := os.Setenv("FINAL_RELEASE_TAG", SetupConfigobject.FinalRelease)
-	if errSetEnv != nil {
-		log.Fatalf("Error setting environment variable: %v", errSetEnv)
+	//errSetEnv := os.Setenv("FINAL_RELEASE_TAG", SetupConfigobject.FinalRelease)
+	//if errSetEnv != nil {
+	//	log.Fatalf("Error setting environment variable: %v", errSetEnv)
+	//}
+	if errWrite := os.WriteFile(os.Getenv("GITHUB_OUTPUT"), []byte(fmt.Sprintf("SAMPLE_TAG=%s\n", SetupConfigobject.FinalRelease)), 0644); errWrite != nil {
+		log.Fatalf("Error writing to stdout: %v", errWrite)
 	}
 
 }
