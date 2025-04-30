@@ -1,8 +1,9 @@
 name: Release Workflow
 on:
   push:
-    branches:
-      - releasetag
+    paths:
+      - dummy-pipeline/release-cmd/releases.yaml
+
   workflow_dispatch:
 
 jobs:
