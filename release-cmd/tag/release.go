@@ -100,7 +100,7 @@ func PromotionalCreation() {
 	//if errSetEnv != nil {
 	//	log.Fatalf("Error setting environment variable: %v", errSetEnv)
 	//}
-	if _, errWrite := os.Stdout.WriteString(fmt.Sprintf("::set-output name=SAMPLE_TAG::%s\n", SetupConfigobject.FinalRelease)); err != nil {
+	if errWrite := os.WriteFile(os.Getenv("GITHUB_OUTPUT"), []byte(fmt.Sprintf("SAMPLE_TAG=%s\n", SetupConfigobject.FinalRelease)), 0644); errWrite != nil {
 		log.Fatalf("Error writing to stdout: %v", errWrite)
 	}
 
