@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"log"
+	"os"
 	"strings"
 )
 
@@ -99,7 +100,9 @@ func PromotionalCreation() {
 	//if errSetEnv != nil {
 	//	log.Fatalf("Error setting environment variable: %v", errSetEnv)
 	//}
-	fmt.Printf("::set-output name=SAMPLE_TAG::%s\n", SetupConfigobject.FinalRelease)
+	if _, errWrite := os.Stdout.WriteString(fmt.Sprintf("::set-output name=SAMPLE_TAG::%s\n", SetupConfigobject.FinalRelease)); err != nil {
+		log.Fatalf("Error writing to stdout: %v", errWrite)
+	}
 
 }
 
