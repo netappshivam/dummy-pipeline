@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"log"
-	"os"
 	"strings"
 )
 
@@ -96,10 +95,11 @@ func PromotionalCreation() {
 		log.Fatalf("Error pushing git tag: %v", errGitPush)
 	}
 
-	errSetEnv := os.Setenv("FINAL_RELEASE_TAG", SetupConfigobject.FinalRelease)
-	if errSetEnv != nil {
-		log.Fatalf("Error setting environment variable: %v", errSetEnv)
-	}
+	//errSetEnv := os.Setenv("FINAL_RELEASE_TAG", SetupConfigobject.FinalRelease)
+	//if errSetEnv != nil {
+	//	log.Fatalf("Error setting environment variable: %v", errSetEnv)
+	//}
+	log.Printf("::set-output name=SAMPLE_TAG::%s\n", SetupConfigobject.FinalRelease)
 
 }
 
