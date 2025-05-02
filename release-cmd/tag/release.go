@@ -23,6 +23,8 @@ func ReleaseType() {
 }
 
 func ReleaseFunc() {
+	FetchDevTag()
+
 	CurrentTag := FetchDevTag()
 
 	sprint := strings.Split(CurrentTag, ".")[0]
