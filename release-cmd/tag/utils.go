@@ -160,3 +160,24 @@ func ReleaseGithub() {
 
 	fmt.Println("Release created successfully!")
 }
+
+func FetchDevTag() string {
+	tagPattern := "*-DEV.*"
+
+	cmd := exec.Command("git", "tag", "-l", "--sort=-v:refname", tagPattern)
+	output, err := cmd.Output()
+	if err != nil {
+		log.Printf("Error executing git command:", err)
+		os.Exit(1)
+	}
+
+	tags := strings.Split(strings.TrimSpace(string(output)), "\n")
+
+	if len(tags) == 0 || tags[0] == "" {
+		log.Printf("No tags found matching the pattern:", tagPattern)
+		os.Exit(0)
+	}
+
+	return tags[0]
+
+}
