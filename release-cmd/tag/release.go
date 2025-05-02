@@ -89,7 +89,11 @@ func ReleaseFunc() {
 			log.Fatalf("Error pushing new tag: %v", errGitPush)
 		}
 
-		if errWrite := os.WriteFile(os.Getenv("GITHUB_OUTPUT"), []byte(fmt.Sprintf("SAMPLE_RC_TAG=%s\n", SetupConfigobject.FinalRelease)), 0644); errWrite != nil {
+		if errWrite := os.WriteFile(os.Getenv("GITHUB_OUTPUT"), []byte(fmt.Sprintf("SAMPLE_RC_TAG=%s\n", rcTag)), 0644); errWrite != nil {
+			log.Fatalf("Error writing to stdout: %v", errWrite)
+		}
+
+		if errWrite := os.WriteFile(os.Getenv("GITHUB_OUTPUT"), []byte(fmt.Sprintf("SAMPLE_DEV_TAG=%s\n", devTag)), 0644); errWrite != nil {
 			log.Fatalf("Error writing to stdout: %v", errWrite)
 		}
 
