@@ -23,7 +23,11 @@ func ReleaseType() {
 }
 
 func ReleaseFunc() {
-	FetchDevTag()
+	errFecth := FetchTagsPrune()
+	if errFecth != nil {
+		log.Printf("Failed to fetch tags: %v", errFecth)
+		return
+	}
 
 	CurrentTag := FetchDevTag()
 
