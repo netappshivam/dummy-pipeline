@@ -1,5 +1,3 @@
 
-base_tag: "2530.0.0-RC.1"
-target_tag: "2530.0.0"
-
-#sample example
+base_tag: ""
+target_tag: ""

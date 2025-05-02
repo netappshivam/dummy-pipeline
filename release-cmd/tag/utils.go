@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 type SetupConfig struct {
@@ -179,5 +180,19 @@ func FetchDevTag() string {
 	}
 
 	return tags[0]
+
+}
+
+func NewSprintName() string {
+
+	currentDate := time.Now()
+	// Calculate the week number of the month
+	weekNumber := fmt.Sprintf("%d", (currentDate.Day()-1)/7+1)
+	currYear := fmt.Sprintf("%02d", currentDate.Year()%100)
+	currMonth := fmt.Sprintf("%02d", currentDate.Month())
+
+	output := currYear + currMonth + weekNumber
+
+	return output
 
 }

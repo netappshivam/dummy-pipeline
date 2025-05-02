@@ -1,8 +1,8 @@
 name: Release Workflow
 on:
-  pull_request:
-    paths:
-      - dummy-pipeline/release-cmd/releases.yaml
+  push:
+    branches:
+      - release/**
 
   workflow_dispatch:
 
@@ -49,5 +49,5 @@ jobs:
 
       - name: Build and push Docker images
         run: |
-          SAMPLE_NAME=${{ steps.release_logic_binary.outputs.SAMPLE_TAG }}
+          SAMPLE_NAME=${{ steps.release_logic_binary.outputs.SAMPLE_RC_TAG }}
           echo "name : $SAMPLE_NAME"
