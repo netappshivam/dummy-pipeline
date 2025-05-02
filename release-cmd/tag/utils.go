@@ -173,6 +173,7 @@ func FetchDevTag() string {
 	}
 
 	tags := strings.Split(strings.TrimSpace(string(output)), "\n")
+	log.Printf(string(output))
 
 	if len(tags) == 0 || tags[0] == "" {
 		log.Printf("No tags found matching the pattern:", tagPattern)
