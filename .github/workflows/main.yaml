@@ -1,10 +1,8 @@
 name: Main Workflow
 on:
   push:
-    branches:
-      - main
-      - release.gcp.**
-  pull_request:
+    paths:
+      - release-cmd/releases.yaml
 
 jobs:
 
