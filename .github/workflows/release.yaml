@@ -2,7 +2,7 @@ name: Release Workflow
 on:
   push:
     paths:
-      - dummy-pipeline/release-cmd/releases.yaml
+      - release-cmd/releases.yaml
 
   workflow_dispatch:
 
