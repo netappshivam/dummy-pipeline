@@ -1,48 +1,14 @@
-name: Go Tag Increment
-
+name: Main Workflow
 on:
-  push:
-    branches:
-      - main
-      - Go-git
-
+  pull_request:
+    paths:
+      - abcd.yaml
 jobs:
 
-  tag-increment:
+  dev_increment:
+    name: Echo
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write  # Allow read and write access to the repository contents
-      actions: read
-      packages: write  # Add this line to allow pushing tags
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Fetch all history for all tags and branches
+      - name: Echo
+        run: echo "Hello World"
 
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: '1.18' # Specify the Go version
-
-      - name: Build increment_tag script
-        run: go build -o increment_tag ./main.go
-
-      - name: Run increment_tag script
-        id: increment_tag
-        run: ./increment_tag
-
-      - name: Configure Git
-        run: |
-          git config --global user.email "Shivam.Bisht@netapp.com"
-          git config --global user.name "netappshivam"
-
-      - name: Create and push new tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-        run: |
-          NEW_TAG=${{ steps.increment_tag.outputs.new_tag }}
-          git tag $NEW_TAG
-          git push origin $NEW_TAG
