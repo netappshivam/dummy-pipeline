@@ -1,7 +1,7 @@
 name: Release Workflow
 on:
   schedule:
-    - cron: '7 6 * * *'
+    - cron: '12 6 * * *'
 
 jobs:
   release_branch:
