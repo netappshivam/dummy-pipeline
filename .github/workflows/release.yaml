@@ -1,10 +1,7 @@
 name: Release Workflow
 on:
-  pull_request:
-    paths:
-      - dummy-pipeline/release-cmd/releases.yaml
-
-  workflow_dispatch:
+  schedule:
+    - cron: '30 11 * * *'
 
 jobs:
   release_branch:
