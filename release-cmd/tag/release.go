@@ -18,12 +18,14 @@ var releaseCmd = &cobra.Command{
 }
 
 func ReleaseType() {
-	if strings.Contains(SetupConfigobject.BaseRelease, "-DEV.") {
-		Release_creation()
-	} else if strings.Contains(SetupConfigobject.BaseRelease, "-RC.") {
-		PromotionalCreation()
-	}
-	ReleaseGithub()
+	//if strings.Contains(SetupConfigobject.BaseRelease, "-DEV.") {
+	//	Release_creation()
+	//} else if strings.Contains(SetupConfigobject.BaseRelease, "-RC.") {
+	//	PromotionalCreation()
+	//}
+	//ReleaseGithub()
+
+	testenvvariable()
 }
 
 func Release_creation() {
@@ -104,6 +106,13 @@ func PromotionalCreation() {
 		log.Fatalf("Error writing to stdout: %v", errWrite)
 	}
 
+}
+
+func testenvvariable() {
+
+	if errWrite := os.WriteFile(os.Getenv("GITHUB_OUTPUT"), []byte(fmt.Sprintf("TEST_TAG=%s\n", "abcd")), 0644); errWrite != nil {
+		log.Fatalf("Error writing to stdout: %v", errWrite)
+	}
 }
 
 func init() {
