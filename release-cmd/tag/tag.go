@@ -10,7 +10,6 @@ var TagCmd = &cobra.Command{
 }
 
 func init() {
-
+	TagCmd.AddCommand(promotionCmd)
 	TagCmd.AddCommand(releaseCmd)
-
 }

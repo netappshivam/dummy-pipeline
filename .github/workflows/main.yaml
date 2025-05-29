@@ -1,38 +1,46 @@
 name: Main Workflow
 on:
-  push:
-    branches:
-      - envvariable
+  workflow_dispatch:
 
 jobs:
-
-  dev_increment:
+  final_tagging:
     permissions:
       contents: write
       actions: read
       packages: write
 
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/vcp-vsa-control-plane/vsacictl:v16
+      options: --user root
 
     steps:
       - name: Checkout codes
         uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.GH_PAT }}
-          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: '1.24.1'
+          go-version-file: go.mod
 
-      - name: Run dev logic
-        id: dev_logic
-        run: go run main.go tag release
-
-      - name: Set Tag
+      - name: Configure Git
         run: |
-          NEW_TAG=${{ steps.dev_logic.outputs.TEST_TAG }}
-          echo "New tag: $NEW_TAG"
-          git tag $NEW_TAG
-          git push origin $NEW_TAG
+          USERNAME=${{ github.actor }}
+          echo "Fetching email for $USERNAME"
+          EMAIL=$(curl -s -H "Authorization: token ${{ secrets.GHVSA_PAT }}" https://api.github.com/users/$USERNAME | jq -r '.email')
+          if [ "$EMAIL" == "null" ]; then
+            EMAIL="$USERNAME@users.noreply.github.com"
+          fi
+          echo "Using email: $EMAIL"
+          echo "Using username: $USERNAME"
+          git config --global user.email "$EMAIL"
+          git config --global user.name "$USERNAME"
+
+        # TODO: use Github bot account here
+
+      - name: Run Promotional logic
+        id: promotional_logic_binary
+        run: vsacictl tag promotional
+        env:
+          GH_PAT: ${{ secrets.GHVSA_PAT }}
+          GITHUB_OUTPUT: $GITHUB_ENV
