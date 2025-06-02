@@ -1,7 +1,10 @@
 name: Release Workflow
+
 on:
   schedule:
-    - cron: '45 6 * * *'
+    - cron: '30 2 * * 5'
+
+  workflow_dispatch:
 
 jobs:
   release_branch:
@@ -10,41 +13,47 @@ jobs:
       actions: read
       packages: write
 
-    runs-on: ubuntu-latest
-
+    runs-on: [ self-hosted,linux ]
     steps:
       - name: Checkout codes
         uses: actions/checkout@v2
         with:
-          token: ${{ secrets.GH_PAT }}
+          token: ${{ secrets.GHVSA_PAT }}
 
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: '1.24.1'
+          go-version-file: go.mod
 
       - name: Configure Git
         run: |
           USERNAME=${{ github.actor }}
           echo "Fetching email for $USERNAME"
-          EMAIL=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" https://api.github.com/users/$USERNAME | jq -r '.email')
+          EMAIL=$(curl -s -H "Authorization: token ${{ secrets.GHVSA_PAT }}" https://api.github.com/users/$USERNAME | jq -r '.email')
           if [ "$EMAIL" == "null" ]; then
             EMAIL="$USERNAME@users.noreply.github.com"
           fi
           echo "Using email: $EMAIL"
           echo "Using username: $USERNAME"
-
           git config --global user.email "$EMAIL"
           git config --global user.name "$USERNAME"
 
       - name: Run release logic
         id: release_logic_binary
-        run: |
-          go run main.go tag release
+        run: go run main.go vsacictl tag release
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          GH_PAT: ${{ secrets.GHVSA_PAT }}
+          GITHUB_OUTPUT: $GITHUB_ENV
 
-      - name: Build and push Docker images
+    outputs:
+      rcTAG: ${{ steps.release_logic_binary.outputs.RC_TAG }}
+      devTAG: ${{ steps.release_logic_binary.outputs.DEV_TAG }}
+
+  print:
+    needs: [release_branch]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print RC and DEV tags
         run: |
-          SAMPLE_NAME=${{ steps.release_logic_binary.outputs.SAMPLE_TAG }}
-          echo "name : $SAMPLE_NAME"
+          echo "RC Tag: ${{ needs.release_branch.outputs.rcTAG }}"
+          echo "DEV Tag: ${{ needs.release_branch.outputs.devTAG }}"

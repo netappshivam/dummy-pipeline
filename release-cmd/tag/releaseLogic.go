@@ -18,6 +18,13 @@ var releaseCmd = &cobra.Command{
 }
 
 func ReleaseFunc() {
+
+	file, err := os.OpenFile(os.Getenv("GITHUB_OUTPUT"), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		log.Fatalf("Error opening file for appending: %v", err)
+	}
+	defer file.Close()
+
 	errFetch := FetchTagsPrune()
 	if errFetch != nil {
 		log.Printf("Failed to fetch tags: %v", errFetch)
@@ -69,7 +76,6 @@ func ReleaseFunc() {
 		if errWrite := os.WriteFile(os.Getenv("GITHUB_OUTPUT"), []byte(fmt.Sprintf("RC_TAG=%s\n", rcTag)), 0644); errWrite != nil {
 			log.Fatalf("Error writing to stdout: %v", errWrite)
 		}
-		ReleaseGithub(true, rcTag)
 	} else {
 		log.Printf("Branch exists")
 	}
@@ -90,5 +96,4 @@ func DevTagCreation(currTag string) {
 	if errWrite := os.WriteFile(os.Getenv("GITHUB_OUTPUT"), []byte(fmt.Sprintf("DEV_TAG=%s\n", devTag)), 0644); errWrite != nil {
 		log.Fatalf("Error writing to stdout: %v", errWrite)
 	}
-	ReleaseGithub(true, devTag)
 }
