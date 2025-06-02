@@ -14,10 +14,6 @@ jobs:
       packages: write
 
     runs-on: [ self-hosted,linux ]
-    container:
-      image: ghcr.io/vcp-vsa-control-plane/vsacictl:v18
-      options: --user root
-
     steps:
       - name: Checkout codes
         uses: actions/checkout@v2
@@ -44,7 +40,7 @@ jobs:
 
       - name: Run release logic
         id: release_logic_binary
-        run: vsacictl tag release
+        run: go run main.go vsacictl tag release
         env:
           GH_PAT: ${{ secrets.GHVSA_PAT }}
           GITHUB_OUTPUT: $GITHUB_ENV
