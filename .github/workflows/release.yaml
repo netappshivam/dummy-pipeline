@@ -40,7 +40,7 @@ jobs:
 
       - name: Run release logic
         id: release_logic_binary
-        run: go run main.go vsacictl tag release
+        run: go run main.go tag release
         env:
           GH_PAT: ${{ secrets.GHVSA_PAT }}
           GITHUB_OUTPUT: $GITHUB_ENV
