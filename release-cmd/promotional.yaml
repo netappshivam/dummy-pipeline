@@ -1,4 +1,4 @@
 
-base_tag: " 25060.0.0-RC.1"
-target_tag: "25060.0.0"
+base_tag: "25051.0.0-RC.1"
+target_tag: "25051.0.0"
 operation_type: "Final_Tag" #This value be either HF_Release or Final_Tag
