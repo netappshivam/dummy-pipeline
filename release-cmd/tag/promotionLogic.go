@@ -2,25 +2,40 @@ package tag
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/spf13/cobra"
 )
 
 var promotionCmd = &cobra.Command{
 	Use:   "promotional",
 	Short: "Command to handle release creation logic",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		PromotionalFunc()
+		PromotionalFunc(&SetupConfig{})
 		return nil
 	},
 }
 
-func PromotionalFunc() {
-	if strings.Contains(SetupConfigobject.BaseRelease, "-RC.") {
-		PromotionalCreation()
+func PromotionalFunc(o *SetupConfig) {
+	if o.OperationType == "Final_Tag" {
+		if FetchTagToCheckIfItExists(o.BaseRelease) && strings.Contains(o.BaseRelease, "-RC.") && o.FinalRelease == o.BaseRelease[:10] {
+			log.Println("Base release is a valid RC tag, proceeding with promotion.")
+		} else {
+			log.Fatalf("Base release %s is not a valid RC tag or Final Release has a naming error %s", o.BaseRelease, o.FinalRelease)
+			return
+		}
+	} else if o.OperationType == "HF_Release" {
+		if FetchTagToCheckIfItExists(o.BaseRelease) && CheckForHFfinalName(o) {
+			log.Println("Base release is a valid HF tag, proceeding with promotion.")
+		} else {
+			log.Fatalf("Base release %s is not a valid HF tag or Final Release has a naming error %s", o.BaseRelease, o.FinalRelease)
+			return
+		}
 	}
+	PromotionalCreation()
+
 }
 
 func PromotionalCreation() {
