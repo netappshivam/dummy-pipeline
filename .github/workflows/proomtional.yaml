@@ -1,0 +1,55 @@
+name: Final Tagging Workflow
+on:
+  workflow_dispatch:
+    - main
+
+jobs:
+  final_tagging:
+    permissions:
+      contents: write
+      actions: read
+      packages: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout codes
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: go.mod
+
+      - name: Configure Git
+        run: |
+          USERNAME=${{ github.actor }}
+          echo "Fetching email for $USERNAME"
+          EMAIL=$(curl -s -H "Authorization: token ${{ secrets.GHVSA_PAT }}" https://api.github.com/users/$USERNAME | jq -r '.email')
+          if [ "$EMAIL" == "null" ]; then
+            EMAIL="$USERNAME@users.noreply.github.com"
+          fi
+          echo "Using email: $EMAIL"
+          echo "Using username: $USERNAME"
+          git config --global user.email "$EMAIL"
+          git config --global user.name "$USERNAME"
+
+        # TODO: use Github bot account here
+
+      - name: Run Promotional logic
+        id: promotional_logic_binary
+        run: go run main.go tag promotional
+        env:
+          GH_PAT: ${{ secrets.GHVSA_PAT }}
+          GITHUB_OUTPUT: $GITHUB_ENV
+
+    outputs:
+      finalTag: ${{ steps.promotional_logic_binary.outputs.FINAL_TAG }}
+
+  print:
+    needs: [ final_tagging ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print RC and DEV tags
+        run: |
+          echo "Final Tag: ${{ needs.final_tagging.outputs.finalTag }}"
