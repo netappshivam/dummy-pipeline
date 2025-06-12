@@ -1,7 +1,6 @@
 name: Final Tagging Workflow
 on:
   workflow_dispatch:
-    - main
 
 jobs:
   final_tagging:

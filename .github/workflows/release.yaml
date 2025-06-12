@@ -5,7 +5,6 @@ on:
     - cron: '30 2 * * 5'
 
   workflow_dispatch:
-    - main
 
 jobs:
   release_branch:
