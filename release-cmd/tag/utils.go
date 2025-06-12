@@ -2,24 +2,27 @@ package tag
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"io"
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
+
+	"gopkg.in/yaml.v3"
 )
 
 type SetupConfig struct {
-	BaseRelease  string `yaml:"base_tag"`
-	FinalRelease string `yaml:"target_tag"`
+	BaseRelease   string `yaml:"base_tag"`
+	FinalRelease  string `yaml:"target_tag"`
+	OperationType string `yaml:"operation_type"`
 }
 
 var SetupConfigobject SetupConfig
 
 func init() {
-	errLoad := loadYaml("./release-cmd/promotional.yaml")
+	errLoad := loadYaml("./cicd/cmd/release-cmd/promotional.yaml")
 	if errLoad != nil {
 		log.Fatal(errLoad)
 		return
@@ -164,4 +167,50 @@ func NewSprintName() string {
 	currMonth := fmt.Sprintf("%02d", currentDate.Month())
 	output := currYear + currMonth + weekNumber
 	return output
+}
+
+func FetchTagToCheckIfItExists(tagName string) bool {
+	cmd := exec.Command("git", "tag", "-l", tagName)
+	output, err := cmd.Output()
+	if err != nil {
+		log.Printf("Error executing git command: %v\n", err)
+		os.Exit(1)
+	}
+
+	if output == nil {
+		log.Printf("No tags found matching the pattern: %s\n", tagName)
+		return true
+	} else {
+		log.Printf("Tag %s found matching the pattern.\n", tagName)
+		return false
+	}
+}
+
+func CheckForHFfinalName(obj *SetupConfig) bool {
+
+	if len(obj.BaseRelease) != 9 {
+		log.Printf("HF base name %s is not valid, should be 9 characters long.\n", obj.BaseRelease)
+		return false
+	}
+
+	num, err := strconv.Atoi(obj.BaseRelease)
+	if err != nil {
+		log.Printf("HF base name %s is not a valid number: %v\n", obj.BaseRelease, err)
+		return false
+	}
+
+	finalNum, errFinal := strconv.Atoi(obj.FinalRelease)
+	if errFinal != nil {
+		log.Printf("HF final name %s is not a valid number: %v\n", obj.FinalRelease, errFinal)
+		return false
+	}
+
+	if finalNum != num+1 {
+		log.Printf("HF final name %s is not valid, should be one greater than base release %s.\n", obj.FinalRelease, obj.BaseRelease)
+		return false
+	} else {
+		log.Printf("HF final name %s is valid, should be one greater than base release %s.\n", obj.FinalRelease, obj.BaseRelease)
+		return true
+	}
+
 }
