@@ -22,6 +22,7 @@ func PromotionalFunc(o *SetupConfig) {
 	if o.OperationType == "Final_Tag" {
 		if !FetchTagToCheckIfItExists(o.BaseRelease) && strings.Contains(o.BaseRelease, "-RC.") && o.FinalRelease == o.BaseRelease[:10] && FetchTagToCheckIfItExists(o.FinalRelease) {
 			log.Println("Base release is a valid RC tag, proceeding with promotion.")
+			PromotionalCreation()
 		} else {
 			log.Fatalf("Base release %s is not a valid RC tag or Final Release has a naming error %s", o.BaseRelease, o.FinalRelease)
 			return
@@ -29,12 +30,12 @@ func PromotionalFunc(o *SetupConfig) {
 	} else if o.OperationType == "HF_Release" {
 		if !FetchTagToCheckIfItExists(o.BaseRelease) && CheckForHFfinalName(o) && FetchTagToCheckIfItExists(o.FinalRelease) {
 			log.Println("Base release is a valid HF tag, proceeding with promotion.")
+			PromotionalCreation()
 		} else {
 			log.Fatalf("Base release %s is not a valid HF tag or Final Release has a naming error %s", o.BaseRelease, o.FinalRelease)
 			return
 		}
 	}
-	PromotionalCreation()
 
 }
 
