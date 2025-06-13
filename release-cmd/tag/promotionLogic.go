@@ -13,13 +13,13 @@ var promotionCmd = &cobra.Command{
 	Use:   "promotional",
 	Short: "Command to handle release creation logic",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		PromotionalFunc()
+		o := &SetupConfig{}
+		o.PromotionalFunc()
 		return nil
 	},
 }
 
-func PromotionalFunc() {
-	o := &SetupConfig{}
+func (o *SetupConfig) PromotionalFunc() {
 	if o.OperationType == "Final_Tag" {
 		if !FetchTagToCheckIfItExists(o.BaseRelease) && strings.Contains(o.BaseRelease, "-RC.") && o.FinalRelease == o.BaseRelease[:10] && FetchTagToCheckIfItExists(o.FinalRelease) {
 			log.Println("Base release is a valid RC tag, proceeding with promotion.")
@@ -37,7 +37,6 @@ func PromotionalFunc() {
 			return
 		}
 	}
-
 }
 
 func PromotionalCreation() {
