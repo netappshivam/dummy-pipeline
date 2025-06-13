@@ -20,6 +20,18 @@ var promotionCmd = &cobra.Command{
 
 func (o *SetupConfig) PromotionalFunc() {
 	if o.OperationType == "Final_Tag" {
+		a := strings.Contains(o.BaseRelease, "-RC.")
+		log.Printf("Value of a: %v", a)
+
+		b := o.FinalRelease == o.BaseRelease[:10]
+		log.Printf("Value of b: %v", b)
+
+		c := !FetchTagToCheckIfItExists(o.FinalRelease)
+		log.Printf("Value of c: %v", c)
+
+		d := FetchTagToCheckIfItExists(o.BaseRelease)
+		log.Printf("Value of d: %v", d)
+
 		if FetchTagToCheckIfItExists(o.BaseRelease) && strings.Contains(o.BaseRelease, "-RC.") && o.FinalRelease == o.BaseRelease[:10] && !FetchTagToCheckIfItExists(o.FinalRelease) {
 			log.Println("Base release is a valid RC tag, proceeding with promotion.")
 			PromotionalCreation()
