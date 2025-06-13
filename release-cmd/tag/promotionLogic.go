@@ -13,8 +13,7 @@ var promotionCmd = &cobra.Command{
 	Use:   "promotional",
 	Short: "Command to handle release creation logic",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		o := &SetupConfig{}
-		o.PromotionalFunc()
+		SetupConfigobject.PromotionalFunc()
 		return nil
 	},
 }
