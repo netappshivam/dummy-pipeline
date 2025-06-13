@@ -20,7 +20,7 @@ var promotionCmd = &cobra.Command{
 
 func (o *SetupConfig) PromotionalFunc() {
 	if o.OperationType == "Final_Tag" {
-		if !FetchTagToCheckIfItExists(o.BaseRelease) && strings.Contains(o.BaseRelease, "-RC.") && o.FinalRelease == o.BaseRelease[:10] && FetchTagToCheckIfItExists(o.FinalRelease) {
+		if FetchTagToCheckIfItExists(o.BaseRelease) && strings.Contains(o.BaseRelease, "-RC.") && o.FinalRelease == o.BaseRelease[:10] && !FetchTagToCheckIfItExists(o.FinalRelease) {
 			log.Println("Base release is a valid RC tag, proceeding with promotion.")
 			PromotionalCreation()
 		} else {
@@ -28,7 +28,7 @@ func (o *SetupConfig) PromotionalFunc() {
 			return
 		}
 	} else if o.OperationType == "HF_Release" {
-		if !FetchTagToCheckIfItExists(o.BaseRelease) && CheckForHFfinalName(o) && FetchTagToCheckIfItExists(o.FinalRelease) {
+		if FetchTagToCheckIfItExists(o.BaseRelease) && CheckForHFfinalName(o) && !FetchTagToCheckIfItExists(o.FinalRelease) {
 			log.Println("Base release is a valid HF tag, proceeding with promotion.")
 			PromotionalCreation()
 		} else {
