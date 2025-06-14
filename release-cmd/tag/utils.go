@@ -173,6 +173,7 @@ func NewSprintName() string {
 func FetchTagToCheckIfItExists(tagName string) bool {
 	cmd := exec.Command("git", "tag", "-l", tagName)
 	output, err := cmd.Output()
+	log.Printf("Output: %s\n", string(output))
 	if err != nil {
 		log.Printf("Error executing git command: %v\n", err)
 		os.Exit(1)
