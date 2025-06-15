@@ -145,8 +145,7 @@ func ReleaseGithub(preRelease bool, tagName string) {
 	log.Println("Release created successfully!")
 }
 
-func FetchDevTag() string {
-	tagPattern := "2*-DEV.*"
+func FetchTag(tagPattern string) string {
 	cmd := exec.Command("git", "tag", "-l", "--sort=-v:refname", tagPattern)
 	output, err := cmd.Output()
 	if err != nil {

@@ -35,13 +35,25 @@ func (o *SetupConfig) PromotionalFunc() {
 		b := strings.Contains(o.BaseRelease, o.FinalRelease)
 		log.Printf("Value of b: %v", b)
 
-		c := !FetchTagToCheckIfItExists(o.FinalRelease)
-		log.Printf("Value of c: %v", c)
+		c := FetchTag(o.FinalRelease)
+		cname := false
+		if c == "" {
+			log.Printf("Tag %s does not exist", o.FinalRelease)
+			cname = true
+		} else {
+			log.Printf("Tag %s exists", o.FinalRelease)
+		}
 
-		d := FetchTagToCheckIfItExists(o.BaseRelease)
-		log.Printf("Value of d: %v", d)
+		d := FetchTag(o.BaseRelease)
+		dname := false
+		if d == "" {
+			log.Printf("Tag %s does not exist", o.BaseRelease)
+		} else {
+			log.Printf("Tag %s exists", o.BaseRelease)
+			dname = true
+		}
 
-		if FetchTagToCheckIfItExists(o.BaseRelease) && strings.Contains(o.BaseRelease, "-RC.") && o.FinalRelease == o.BaseRelease[:10] && !FetchTagToCheckIfItExists(o.FinalRelease) {
+		if dname && strings.Contains(o.BaseRelease, "-RC.") && o.FinalRelease == o.BaseRelease[:10] && cname {
 			log.Println("Base release is a valid RC tag, proceeding with promotion.")
 			PromotionalCreation()
 		} else {

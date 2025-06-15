@@ -30,7 +30,7 @@ func ReleaseFunc() {
 		log.Printf("Failed to fetch tags: %v", errFetch)
 		return
 	}
-	CurrentTag := FetchDevTag()
+	CurrentTag := FetchTag("2*-DEV.*")
 	sprint := strings.Split(CurrentTag, ".")[0]
 	log.Printf("Checking if branch exists for release --> %s\n", sprint)
 
