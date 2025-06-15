@@ -25,8 +25,8 @@ func (o *SetupConfig) PromotionalFunc() {
 			log.Printf("Failed to fetch tags: %v", errFetch)
 			return
 		}
-		log.Printf("base: ", o.BaseRelease)
-		log.Printf("final: ", o.FinalRelease)
+		log.Printf("base: %s", o.BaseRelease)
+		log.Printf("final: %s", o.FinalRelease)
 		log.Printf("Operation Type: %s", o.OperationType)
 
 		a := strings.Contains(o.BaseRelease, "-RC.")
