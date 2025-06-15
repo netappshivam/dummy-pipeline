@@ -31,6 +31,10 @@ func ReleaseFunc() {
 		return
 	}
 	CurrentTag := FetchTag("2*-DEV.*")
+	if CurrentTag == "" {
+		log.Println("No current development tag found, exiting.")
+		return
+	}
 	sprint := strings.Split(CurrentTag, ".")[0]
 	log.Printf("Checking if branch exists for release --> %s\n", sprint)
 
