@@ -53,6 +53,9 @@ func (o *SetupConfig) PromotionalFunc() {
 			dname = true
 		}
 
+		log.Printf("cname: %v", cname)
+		log.Printf("dname: %v", dname)
+
 		if dname && strings.Contains(o.BaseRelease, "-RC.") && o.FinalRelease == o.BaseRelease[:10] && cname {
 			log.Println("Base release is a valid RC tag, proceeding with promotion.")
 			PromotionalCreation()
