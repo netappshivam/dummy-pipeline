@@ -193,13 +193,13 @@ func CheckForHFfinalName() bool {
 		return false
 	}
 
-	num, err := strconv.Atoi(obj.BaseRelease)
+	num, err := strconv.Atoi(string(obj.BaseRelease[8]))
 	if err != nil {
 		log.Printf("HF base name %s is not a valid number: %v\n", obj.BaseRelease, err)
 		return false
 	}
 
-	finalNum, errFinal := strconv.Atoi(obj.FinalRelease)
+	finalNum, errFinal := strconv.Atoi(string(obj.FinalRelease[8]))
 	if errFinal != nil {
 		log.Printf("HF final name %s is not a valid number: %v\n", obj.FinalRelease, errFinal)
 		return false
