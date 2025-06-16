@@ -19,52 +19,49 @@ var promotionCmd = &cobra.Command{
 }
 
 func (o *SetupConfig) PromotionalFunc() {
-	if o.OperationType == "Final_Tag" {
-		errFetch := FetchTagsPrune()
-		if errFetch != nil {
-			log.Printf("Failed to fetch tags: %v", errFetch)
-			return
-		}
+	errFetch := FetchTagsPrune()
+	if errFetch != nil {
+		log.Printf("Failed to fetch tags: %v", errFetch)
+		return
+	}
 
-		a := strings.Contains(o.BaseRelease, "-RC.")
-		log.Printf("Value of a: %v", a)
+	FinalTagCheck := FetchTag(o.FinalRelease)
+	FinalTagCheckFlag := false
+	if FinalTagCheck == "" {
+		log.Printf("Final Tag %s does not exist", o.FinalRelease)
+		FinalTagCheckFlag = true
+	} else {
+		log.Printf("Final Tag %s exists, cannot perform operation", o.FinalRelease)
+	}
 
-		b := strings.Contains(o.BaseRelease, o.FinalRelease)
-		log.Printf("Value of b: %v", b)
+	BaseTagCheck := FetchTag(o.BaseRelease)
+	BaseTagCheckFlag := false
+	if BaseTagCheck == "" {
+		log.Printf("Base tag %s does not exist, cannot perform operation", o.BaseRelease)
+	} else {
+		log.Printf("Base Tag %s exists", o.BaseRelease)
+		BaseTagCheckFlag = true
+	}
 
-		c := FetchTag(o.FinalRelease)
-		cname := false
-		if c == "" {
-			log.Printf("Tag %s does not exist", o.FinalRelease)
-			cname = true
-		} else {
-			log.Printf("Tag %s exists", o.FinalRelease)
-		}
-
-		d := FetchTag(o.BaseRelease)
-		dname := false
-		if d == "" {
-			log.Printf("Tag %s does not exist", o.BaseRelease)
-		} else {
-			log.Printf("Tag %s exists", o.BaseRelease)
-			dname = true
-		}
-
-		if dname && strings.Contains(o.BaseRelease, "-RC.") && strings.Contains(o.BaseRelease, o.FinalRelease) && cname {
+	if o.OperationType == "FinalTag" {
+		if BaseTagCheckFlag && strings.Contains(o.BaseRelease, "-RC.") && strings.Contains(o.BaseRelease, o.FinalRelease) && FinalTagCheckFlag {
 			log.Println("Base release is a valid RC tag, proceeding with promotion.")
 			PromotionalCreation()
 		} else {
 			log.Fatalf("Base release %s is not a valid RC tag or Final Release has a naming error %s", o.BaseRelease, o.FinalRelease)
 			return
 		}
-	} else if o.OperationType == "HF_Release" {
-		if FetchTagToCheckIfItExists(o.BaseRelease) && CheckForHFfinalName(o) && !FetchTagToCheckIfItExists(o.FinalRelease) {
+	} else if o.OperationType == "HFFirstRelease" {
+		if BaseTagCheckFlag && CheckForHFfinalName() && FinalTagCheckFlag {
 			log.Println("Base release is a valid HF tag, proceeding with promotion.")
 			PromotionalCreation()
 		} else {
 			log.Fatalf("Base release %s is not a valid HF tag or Final Release has a naming error %s", o.BaseRelease, o.FinalRelease)
 			return
 		}
+	} else {
+		log.Fatalf("Invalid operation type: %s. Operation can only be FinalTag or HFFirstRelease. ", o.OperationType)
+		return
 	}
 }
 

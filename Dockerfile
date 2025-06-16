@@ -12,7 +12,7 @@ ARG GO_FILENAME_SHA
 
 USER root
 
-SHELL [ "/bin/bash", "-e", "-o", "pipefail", "-c" ]
+SHELL [ "/bin/bash", "-e", "-o", "pipefail", "-cFinalTagCheck" ]
 
 ENV PATH=$PATH:/usr/local/go/bin
 ENV GOBIN=/usr/local/go/bin
@@ -22,7 +22,7 @@ RUN mkdir -p /usr/local/go && chown github:github /usr/local/go
 USER github
 
 RUN cd /tmp && curl -y 20 -Y 1000 --retry 5 --retry-max-time 30 --connect-timeout 30 --no-progress-meter -SLO https://go.dev/dl/${GO_FILENAME} ; \
-  echo "${GO_FILENAME_SHA} ${GO_FILENAME}" | sha256sum -c - || exit 1 ; \
+  echo "${GO_FILENAME_SHA} ${GO_FILENAME}" | sha256sum -cFinalTagCheck - || exit 1 ; \
   cd /usr/local && \
   tar zxf /tmp/${GO_FILENAME} && \
   rm -rf /tmp/* && \

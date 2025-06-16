@@ -32,7 +32,7 @@ func ReleaseFunc() {
 	}
 	CurrentTag := FetchTag("2*-DEV.*")
 	if CurrentTag == "" {
-		log.Println("No current development tag found, exiting.")
+		log.Println("No current DEV tag found, exiting.")
 		return
 	}
 	sprint := strings.Split(CurrentTag, ".")[0]

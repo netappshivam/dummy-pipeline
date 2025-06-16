@@ -23,7 +23,6 @@ var SetupConfigobject SetupConfig
 
 func init() {
 	errLoad := loadYaml("./release-cmd/promotional.yaml")
-	log.Printf("Loading configuration from ./release-cmd/promotional.yaml")
 	if errLoad != nil {
 		log.Fatal(errLoad)
 		return
@@ -172,13 +171,12 @@ func NewSprintName() string {
 func FetchTagToCheckIfItExists(tagName string) bool {
 	cmd := exec.Command("git", "tag", "-l", tagName)
 	output, err := cmd.Output()
-	log.Printf("Output: %s\n", string(output))
 	if err != nil {
 		log.Printf("Error executing git command: %v\n", err)
 		os.Exit(1)
 	}
 
-	if output == nil {
+	if len(output) == 0 {
 		log.Printf("No tags found matching the pattern: %s\n", tagName)
 		return true
 	} else {
@@ -187,7 +185,8 @@ func FetchTagToCheckIfItExists(tagName string) bool {
 	}
 }
 
-func CheckForHFfinalName(obj *SetupConfig) bool {
+func CheckForHFfinalName() bool {
+	obj := SetupConfigobject
 
 	if len(obj.BaseRelease) != 9 {
 		log.Printf("HF base name %s is not valid, should be 9 characters long.\n", obj.BaseRelease)
@@ -213,5 +212,4 @@ func CheckForHFfinalName(obj *SetupConfig) bool {
 		log.Printf("HF final name %s is valid, should be one greater than base release %s.\n", obj.FinalRelease, obj.BaseRelease)
 		return true
 	}
-
 }
