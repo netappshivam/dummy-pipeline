@@ -20,6 +20,12 @@ var promotionCmd = &cobra.Command{
 
 func (o *SetupConfig) PromotionalFunc() {
 	if o.OperationType == "Final_Tag" {
+		errFetch := FetchTagsPrune()
+		if errFetch != nil {
+			log.Printf("Failed to fetch tags: %v", errFetch)
+			return
+		}
+
 		a := strings.Contains(o.BaseRelease, "-RC.")
 		log.Printf("Value of a: %v", a)
 
