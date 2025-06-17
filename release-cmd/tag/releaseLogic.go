@@ -13,6 +13,7 @@ var releaseCmd = &cobra.Command{
 	Use:   "release",
 	Short: "Command to handle release creation logic",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		cmd.SilenceUsage = true
 		ReleaseFunc()
 		return nil
 	},
@@ -23,7 +24,11 @@ func ReleaseFunc() {
 	if err != nil {
 		log.Fatalf("Error opening file for appending: %v", err)
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Printf("Error closing file: %v", err)
+		}
+	}()
 
 	errFetch := FetchTagsPrune()
 	if errFetch != nil {
@@ -80,6 +85,9 @@ func ReleaseFunc() {
 		if _, errWrite := file.WriteString(fmt.Sprintf("RC_TAG=%s\n", rcTag)); errWrite != nil {
 			log.Fatalf("Error writing RC_TAG: %v", errWrite)
 		}
+		if _, errWrite := file.WriteString(fmt.Sprintf("RC_BRANCH=%s\n", latestSprintBranch)); errWrite != nil {
+			log.Fatalf("Error writing RC_BRANCH: %v", errWrite)
+		}
 	} else {
 		log.Printf("Branch exists")
 	}
@@ -99,5 +107,8 @@ func DevTagCreation(currTag string, file *os.File) {
 	}
 	if _, errWrite := file.WriteString(fmt.Sprintf("DEV_TAG=%s\n", devTag)); errWrite != nil {
 		log.Fatalf("Error writing DEV_TAG: %v", errWrite)
+	}
+	if _, errWrite := file.WriteString(fmt.Sprintf("DEV_BRANCH=%s\n", "main")); errWrite != nil {
+		log.Fatalf("Error writing DEV_BRANCH: %v", errWrite)
 	}
 }

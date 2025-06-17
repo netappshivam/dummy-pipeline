@@ -13,6 +13,7 @@ var promotionCmd = &cobra.Command{
 	Use:   "promotional",
 	Short: "Command to handle release creation logic",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		cmd.SilenceUsage = true
 		SetupConfigobject.PromotionalFunc()
 		return nil
 	},
@@ -26,25 +27,21 @@ func (o *SetupConfig) PromotionalFunc() {
 	}
 
 	FinalTagCheck := FetchTag(o.FinalRelease)
-	FinalTagCheckFlag := false
 	if FinalTagCheck == "" {
 		log.Printf("Final Tag %s does not exist", o.FinalRelease)
-		FinalTagCheckFlag = true
 	} else {
 		log.Printf("Final Tag %s exists, cannot perform operation", o.FinalRelease)
 	}
 
 	BaseTagCheck := FetchTag(o.BaseRelease)
-	BaseTagCheckFlag := false
 	if BaseTagCheck == "" {
 		log.Printf("Base tag %s does not exist, cannot perform operation", o.BaseRelease)
 	} else {
 		log.Printf("Base Tag %s exists", o.BaseRelease)
-		BaseTagCheckFlag = true
 	}
 
 	if o.OperationType == "FinalTag" {
-		if BaseTagCheckFlag && strings.Contains(o.BaseRelease, "-RC.") && strings.Contains(o.BaseRelease, o.FinalRelease) && FinalTagCheckFlag {
+		if BaseTagCheck != "" && strings.Contains(o.BaseRelease, "-RC.") && strings.Contains(o.BaseRelease, o.FinalRelease) && FinalTagCheck == "" {
 			log.Println("Base release is a valid RC tag, proceeding with promotion.")
 			PromotionalCreation()
 		} else {
@@ -52,7 +49,7 @@ func (o *SetupConfig) PromotionalFunc() {
 			return
 		}
 	} else if o.OperationType == "HFFirstRelease" {
-		if BaseTagCheckFlag && CheckForHFfinalName() && FinalTagCheckFlag {
+		if BaseTagCheck != "" && CheckForHFfinalName() && FinalTagCheck == "" {
 			log.Println("Base release is a valid HF tag, proceeding with promotion.")
 			PromotionalCreation()
 		} else {
@@ -66,14 +63,24 @@ func (o *SetupConfig) PromotionalFunc() {
 }
 
 func PromotionalCreation() {
+	file, err := os.OpenFile(os.Getenv("GITHUB_OUTPUT"), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		log.Fatalf("Error opening file for appending: %v", err)
+	}
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Printf("Error closing file: %v", err)
+		}
+	}()
+
 	errFetch := FetchTagsPrune()
 	if errFetch != nil {
 		log.Printf("Failed to fetch tags: %v", errFetch)
 		return
 	}
 
-	err := CleanWorkingDirectory()
-	if err != nil {
+	errClean := CleanWorkingDirectory()
+	if errClean != nil {
 		log.Fatalf("Error cleaning working directory: %v", err)
 	}
 
@@ -86,10 +93,18 @@ func PromotionalCreation() {
 	if errGitPush != nil {
 		log.Fatalf("Error pushing git tag: %v", errGitPush)
 	}
+	sprint := strings.Split(SetupConfigobject.FinalRelease, ".")[0]
 
-	if errWrite := os.WriteFile(os.Getenv("GITHUB_OUTPUT"), []byte(fmt.Sprintf("FINAL_TAG=%s\n", SetupConfigobject.FinalRelease)), 0644); errWrite != nil {
-		log.Fatalf("Error writing to stdout: %v", errWrite)
+	branchName := "release/" + sprint
+
+	if _, errWrite := file.WriteString(fmt.Sprintf("FINAL_TAG=%s\n", SetupConfigobject.FinalRelease)); errWrite != nil {
+		log.Fatalf("Error writing FINAL_TAG: %v", errWrite)
 	}
+
+	if _, errWrite := file.WriteString(fmt.Sprintf("FINAL_BRANCH=%s\n", branchName)); errWrite != nil {
+		log.Fatalf("Error writing FINAL_BRANCH: %v", errWrite)
+	}
+
 }
 
 func init() {

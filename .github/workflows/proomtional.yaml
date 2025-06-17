@@ -44,6 +44,7 @@ jobs:
 
     outputs:
       finalTag: ${{ steps.promotional_logic_binary.outputs.FINAL_TAG }}
+      finalBranch: ${{ steps.promotional_logic_binary.outputs.FINAL_BRANCH }}
 
   print:
     needs: [ final_tagging ]
@@ -52,3 +53,4 @@ jobs:
       - name: Print RC and DEV tags
         run: |
           echo "Final Tag: ${{ needs.final_tagging.outputs.finalTag }}"
+          echo "Final Branch: ${{ needs.final_tagging.outputs.finalBranch }}"

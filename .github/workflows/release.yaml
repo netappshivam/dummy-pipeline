@@ -48,6 +48,8 @@ jobs:
     outputs:
       rcTAG: ${{ steps.release_logic_binary.outputs.RC_TAG }}
       devTAG: ${{ steps.release_logic_binary.outputs.DEV_TAG }}
+      rcBranch: ${{ steps.release_logic_binary.outputs.RC_BRANCH }}
+      devBranch: ${{ steps.release_logic_binary.outputs.DEV_BRANCH }}
 
   print:
     needs: [release_branch]
@@ -57,3 +59,5 @@ jobs:
         run: |
           echo "RC Tag: ${{ needs.release_branch.outputs.rcTAG }}"
           echo "DEV Tag: ${{ needs.release_branch.outputs.devTAG }}"
+          echo "RC Branch: ${{ needs.release_branch.outputs.rcBranch }}"
+            echo "DEV Branch: ${{ needs.release_branch.outputs.devBranch }}"

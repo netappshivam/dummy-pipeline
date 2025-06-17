@@ -125,25 +125,6 @@ func FetchReleaseBranch(BranchName string) (string, error) {
 	return branch, nil
 }
 
-func ReleaseGithub(preRelease bool, tagName string) {
-	repo := os.Getenv("GITHUB_REPOSITORY")
-	token := os.Getenv("GH_PAT")
-	cmdArgs := []string{"release", "create", "-R", fmt.Sprintf("https://github.com/%s", repo), "--generate-notes"}
-	if preRelease == true {
-		cmdArgs = append(cmdArgs, "--prerelease")
-	}
-	cmdArgs = append(cmdArgs, tagName)
-	cmd := exec.Command("gh", cmdArgs...)
-	cmd.Env = append(os.Environ(), fmt.Sprintf("GITHUB_TOKEN=%s", token))
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		log.Printf("Error: %v\n", err)
-		log.Printf("Output: %s\n", string(output))
-		return
-	}
-	log.Println("Release created successfully!")
-}
-
 func FetchTag(tagPattern string) string {
 	cmd := exec.Command("git", "tag", "-l", "--sort=-v:refname", tagPattern)
 	output, err := cmd.Output()
@@ -166,23 +147,6 @@ func NewSprintName() string {
 	currMonth := fmt.Sprintf("%02d", currentDate.Month())
 	output := currYear + currMonth + weekNumber
 	return output
-}
-
-func FetchTagToCheckIfItExists(tagName string) bool {
-	cmd := exec.Command("git", "tag", "-l", tagName)
-	output, err := cmd.Output()
-	if err != nil {
-		log.Printf("Error executing git command: %v\n", err)
-		os.Exit(1)
-	}
-
-	if len(output) == 0 {
-		log.Printf("No tags found matching the pattern: %s\n", tagName)
-		return true
-	} else {
-		log.Printf("Tag %s found matching the pattern.\n", tagName)
-		return false
-	}
 }
 
 func CheckForHFfinalName() bool {
