@@ -62,7 +62,7 @@ jobs:
               create_time_epoch=$(date -j -f "%Y-%m-%dT%H:%M:%S" "$create_time" +%s 2>/dev/null || date -d "$create_time" +%s)
               age_days=$(( (current_date - create_time_epoch) / 86400 ))
 
-              if [[ -z "$create_time" ||  $age_days -gt 5 && "$digest" != "$LATEST_DIGEST" ]]; then
+              if [[ -z "$create_time" &&  $age_days -gt 5 && "$digest" != "$LATEST_DIGEST" ]]; then
                 gcloud artifacts docker images delete "$image@$digest"  --quiet
                 continue
               fi
