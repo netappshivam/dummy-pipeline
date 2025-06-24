@@ -1,0 +1,93 @@
+name: Create Pre-Release and Publish Docker images
+
+on:
+  workflow_dispatch:
+    
+jobs:
+  create_pre_release_vsa_control_plane:
+    name: Create Pre-Release and Publish Docker images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Decode and configure GCP service account
+        env:
+          GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_KEY }}
+        run: |
+          echo "$GCP_SERVICE_ACCOUNT_KEY" | base64 -d > gcloud-key.json
+          gcloud auth activate-service-account --key-file=gcloud-key.json
+          gcloud auth configure-docker us-east1-docker.pkg.dev --quiet
+          gcloud config set project g1p-functional-poc-01 --quiet
+
+      - name: Cleanup Job
+        shell: bash
+        run: |
+          
+          # Define the repository and images
+          REPO="us-east1-docker.pkg.dev/g1p-functional-poc-01/vcp-vsa-control-plane"
+          IMAGES=("core" "google-proxy" "vcp-db-migrate" "vcp-worker")
+          current_date=$(date +%s)
+          
+          # Process each image
+          for IMAGE in "${IMAGES[@]}"; do
+            echo "Processing image: $IMAGE"
+          
+            # Fetch the latest digest
+            LATEST_DIGEST=$(gcloud artifacts docker images list "$REPO/$IMAGE" \
+              --include-tags --sort-by=~UPDATE_TIME --limit=1 --format="value(DIGEST)")
+          
+            if [[ -z "$LATEST_DIGEST" ]]; then
+              echo "No latest digest found for $IMAGE. Skipping..."
+              continue
+            fi
+          
+            echo "Latest digest for $IMAGE: $LATEST_DIGEST"
+          
+            # List all images and process them
+            gcloud artifacts docker images list "$REPO/$IMAGE" --include-tags \
+            --format="value(IMAGE,DIGEST,TAGS,CREATE_TIME)" | tee /dev/stderr | while read -r line; do
+          
+              image=$(echo "$line" | awk '{print $1}')
+              digest=$(echo "$line" | awk '{print $2}')
+              tags_arr=$(echo "$line" | awk '{print $3}')
+              create_time=$(echo "$line" | awk '{print $4}')
+              IFS=',' read -r -a tags <<< "$tags_arr"
+          
+              # Convert create_time to epoch
+              create_time_epoch=$(date -j -f "%Y-%m-%dT%H:%M:%S" "$create_time" +%s 2>/dev/null || date -d "$create_time" +%s)
+              age_days=$(( (current_date - create_time_epoch) / 86400 ))
+
+              if [[ -z "$create_time" ||  $age_days -gt $AR_RETENTION_WINDOW_IN_DAYS && "$digest" != "$LATEST_DIGEST" ]]; then
+                gcloud artifacts docker images delete "$image@$digest"  --quiet
+                continue
+              fi
+          
+              # Delete old digests except the latest
+              if [[ $age_days -gt 5 && "$digest" != "$LATEST_DIGEST" ]]; then
+                echo "Deleting tags for image: $image@$digest"
+                ALL_TAGS_DELETED=1
+                for tag in "${tags[@]}"; do
+                  if [[ "$tag" == *dev* || "$tag" == *rc* ]]; then
+                    gcloud artifacts tags delete "$tag" --location="us-east1" --package="$IMAGE" --repository="vcp-vsa-control-plane" --quiet
+                    echo "Deleted tag: $tag for image: $image@$digest"
+                  else
+                    echo "Skipping tag: $tag for image: $image@$digest as it does not match DEV or RC"
+                    ALL_TAGS_DELETED=0
+                  fi
+                done
+                if [[ $ALL_TAGS_DELETED -eq 1 ]]; then
+                  echo "Deleting image: $image@$digest as all tags were deleted"
+                  gcloud artifacts docker images delete "$image@$digest"  --quiet
+                else
+                  echo "Not deleting image: $image@$digest as not all tags were deleted"
+                fi
+              fi
+            done
+          done
+
+          
