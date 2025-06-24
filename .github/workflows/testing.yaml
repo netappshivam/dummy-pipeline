@@ -30,7 +30,7 @@ jobs:
           
           # Define the repository and images
           REPO="us-east1-docker.pkg.dev/g1p-functional-poc-01/vcp-vsa-control-plane"
-          IMAGES=("core" "google-proxy" "vcp-db-migrate" "vcp-worker")
+          IMAGES=("core" "google-proxy")
           current_date=$(date +%s)
           
           # Process each image
@@ -62,7 +62,7 @@ jobs:
               create_time_epoch=$(date -j -f "%Y-%m-%dT%H:%M:%S" "$create_time" +%s 2>/dev/null || date -d "$create_time" +%s)
               age_days=$(( (current_date - create_time_epoch) / 86400 ))
 
-              if [[ -z "$create_time" ||  $age_days -gt $AR_RETENTION_WINDOW_IN_DAYS && "$digest" != "$LATEST_DIGEST" ]]; then
+              if [[ -z "$create_time" ||  $age_days -gt 5 && "$digest" != "$LATEST_DIGEST" ]]; then
                 gcloud artifacts docker images delete "$image@$digest"  --quiet
                 continue
               fi
