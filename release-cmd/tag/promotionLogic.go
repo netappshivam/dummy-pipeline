@@ -28,7 +28,7 @@ func (o *SetupConfig) PromotionalFunc() {
 
 	FinalTagCheck := FetchTag(o.FinalRelease)
 	if FinalTagCheck == "" {
-		log.Printf("Final Tag %s does not exist", o.FinalRelease)
+		log.Printf("Final Tag %s does not exisFt", o.FinalRelease)
 	} else {
 		log.Printf("Final Tag %s exists, cannot perform operation", o.FinalRelease)
 	}
@@ -83,6 +83,8 @@ func PromotionalCreation() {
 	if errClean != nil {
 		log.Fatalf("Error cleaning working directory: %v", err)
 	}
+
+	log.Printf("Created tag %s from base tag %s", SetupConfigobject.FinalRelease, SetupConfigobject.BaseRelease)
 
 	ShaOfBaseTag, errSha := GetTagSHAFromGitHub(SetupConfigobject.BaseRelease)
 	if errSha != nil {
