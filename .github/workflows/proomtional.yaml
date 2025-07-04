@@ -20,20 +20,10 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Configure Git
+      - name: gh auth login
         run: |
-          USERNAME=${{ github.actor }}
-          echo "Fetching email for $USERNAME"
-          EMAIL=$(curl -s -H "Authorization: token ${{ secrets.GHVSA_PAT }}" https://api.github.com/users/$USERNAME | jq -r '.email')
-          if [ "$EMAIL" == "null" ]; then
-            EMAIL="$USERNAME@users.noreply.github.com"
-          fi
-          echo "Using email: $EMAIL"
-          echo "Using username: $USERNAME"
-          git config --global user.email "$EMAIL"
-          git config --global user.name "$USERNAME"
-
-        # TODO: use Github bot account here
+          echo "Logging in to GitHub CLI"
+          echo "${{ secrets.GHVSA_PAT }}" | gh auth login --with-token
 
       - name: Run Promotional logic
         id: promotional_logic_binary
@@ -45,6 +35,7 @@ jobs:
     outputs:
       finalTag: ${{ steps.promotional_logic_binary.outputs.FINAL_TAG }}
       finalBranch: ${{ steps.promotional_logic_binary.outputs.FINAL_BRANCH }}
+      baseTagSHA: ${{ steps.promotional_logic_binary.outputs.BASE_TAG_SHA }}
 
   print:
     needs: [ final_tagging ]
@@ -54,3 +45,4 @@ jobs:
         run: |
           echo "Final Tag: ${{ needs.final_tagging.outputs.finalTag }}"
           echo "Final Branch: ${{ needs.final_tagging.outputs.finalBranch }}"
+          echo "Base Tag SHA: ${{ needs.final_tagging.outputs.baseTagSHA }}"
